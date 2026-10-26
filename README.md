@@ -5,11 +5,16 @@ Er is nog geen werkende VST3 gebouwd. De aangeleverde macOS-plug-ins bevatten
 gecompileerde Mach-O-programma's, geen broncode die rechtstreeks voor Windows
 kan worden gebouwd.
 
-## Huidige stap: de zelfstandige Windows-app laten starten
+## Bevestigd: zelfstandig starten en geluid op Windows 10
 
-De originele Windows-app bereikt op de Windows 10-pc de eerste benchmark.
-Daarna roept ReBirth de oude Windows Help-functie aan; Windows opent vervolgens
-een Microsoft-pagina en er verschijnt een melding `(9009)`.
+De gebruiker heeft op 26 oktober 2026 bevestigd dat ReBirth met de nieuwe
+launcher start en dat het afspelen van een demonummer hoorbaar werkt. Na normaal
+afsluiten via File > Quit start ook het originele `Rebirth.exe` weer met geluid,
+zonder PowerShell en zonder opnieuw vast te lopen bij de eerste benchmark/Help.
+De launcher hoeft op deze installatie dus niet bij iedere start te worden gebruikt.
+
+De eerdere blokkade ontstond bij de automatische Windows Help-aanroep na de
+eerste benchmark. Windows opende een Microsoft-pagina en er verscheen `(9009)`.
 
 Een eerdere testkopie met vijf gewijzigde bytes in het EXE-bestand is **ingetrokken**.
 Die wijziging verstoort ReBirths eigen bestandscontrole, slaat daardoor de
@@ -22,9 +27,23 @@ versie en de instructies, en slaat alleen in dat nieuwe proces de automatische
 eerste Help-aanroep over. De bestandscontrole en oorspronkelijke mediacontrole
 blijven actief. Windows-systeembestanden en het register worden niet gewijzigd.
 
-**Dit is een kandidaat voor een Windows-test.** De controles in de Linux-cloud
-bevestigen invoercontrole, foutafhandeling en specifieke programma-invarianten.
-Ze bewijzen nog geen geslaagde Windows-start of hoorbaar geluid.
+De start en hoorbare geluidsweergave zijn nu door de gebruiker op Windows 10
+getest. De controles in de Linux-cloud bevestigen daarnaast invoercontrole,
+foutafhandeling en specifieke programma-invarianten. Ableton-integratie,
+transportkoppeling, VST3-projectstatus en meerdere plug-ininstanties zijn nog
+niet gevalideerd.
+
+## Volgende stap: de oude engine-interface controleren
+
+De oude engine is een 32-bits DLL met een ReWire 1-interface. Die kan niet
+rechtstreeks in het 64-bits proces van Ableton Live worden geladen. De te
+onderzoeken route is een afzonderlijke 32-bits helper, met later een 64-bits
+VST3 die audio en transport met die helper uitwisselt.
+
+Eerst moet een kleine testhost de precieze oude interface en echte
+audio-overdracht aantonen. De aangeleverde DLL gebruikt een andere
+audio-structuur dan latere ReWire-headers; die headers kunnen niet blind worden
+overgenomen. Een VST3-wrapper volgt pas na een geslaagde engineproef.
 
 ## Testen op Windows 10
 

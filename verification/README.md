@@ -18,7 +18,19 @@ Recorded validation on 2026-10-26 in the Linux cloud environment:
   new child. This is an unresolved limitation of that emulated test path and
   does not validate the launcher's native process-memory calls on Windows.
 
-These results do not establish native Windows API execution, a working ReBirth
-window, media compatibility, audible output, preference persistence or VST3
-support. The startup candidate must be tested on Windows before any readiness
-claim. The original source files are not included in this repository.
+These cloud results alone do not establish native Windows API execution, audible
+output or VST3 support. The original source files are not included in this
+repository.
+
+Subsequent user-reported Windows 10 validation, 2026-10-26:
+
+- ReBirth starts using the new compatibility launcher.
+- A demo song plays with audible sound.
+- After a normal File > Quit, the original `C:\ReBirth RB-338\Rebirth.exe` starts
+  again with sound without PowerShell or the former first-run Help interruption.
+  This confirms normal quit/reopen behavior on that installation; preference
+  file paths and contents were not independently inspected.
+
+These are the user's observations on their Windows PC, separate from the Linux
+tests. No Ableton integration, ReWire-host audio render, VST3 transport, project
+state or multiple-instance behavior has been verified yet.
