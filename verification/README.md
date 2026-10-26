@@ -34,3 +34,18 @@ Subsequent user-reported Windows 10 validation, 2026-10-26:
 These are the user's observations on their Windows PC, separate from the Linux
 tests. No Ableton integration, ReWire-host audio render, VST3 transport, project
 state or multiple-instance behavior has been verified yet.
+
+Initial bridge diagnostic results in the separate Wine/QEMU environment:
+
+- The x86 metadata probe returned exit 0, API/info version 8, all 18 expected
+  channels and intact output-buffer canaries. It did not open the engine.
+- A same-size altered DLL was rejected before loading with exit 1 and
+  `ERROR_CRC` (23). Both metadata runs also emitted an unresolved QEMU signal-11
+  warning, including the refusal path before loading the engine DLL.
+- The separate lifecycle probe completed Open (result 1), ten Idle calls,
+  IsCloseOK, Close, FreeLibrary and an unchanged file hash with exit 0. Neither
+  its own watchdog nor the external timeout fired. This run had no QEMU warning.
+- All original EXE/DLL hashes remained unchanged. No render function was called.
+
+These diagnostics exercise the exact legacy DLL under Wine; they are not
+native Windows 10 bridge tests or evidence of hosted music playback.

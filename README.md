@@ -45,6 +45,14 @@ audio-overdracht aantonen. De aangeleverde DLL gebruikt een andere
 audio-structuur dan latere ReWire-headers; die headers kunnen niet blind worden
 overgenomen. Een VST3-wrapper volgt pas na een geslaagde engineproef.
 
+De [eerste diagnostiek](bridge-prototype/README.md) en
+[analyse van de oude audiostructuur](bridge-prototype/legacy-drive-notes.md)
+staan bij de broncode. De metadata-aanroepen zijn onder Wine uitgevoerd en
+leveren versie 8 en de 18 verwachte kanalen op. Een afzonderlijke proef heeft
+daar ook Open, tien Idle-aanroepen, de sluitingscontrole, Close en het ontladen
+van de DLL succesvol doorlopen. Dat bewijst nog geen audio-overdracht naar een
+andere host; de renderproef en een Windows-test van de helper blijven nodig.
+
 ## Testen op Windows 10
 
 1. Gebruik de complete originele map `C:\ReBirth RB-338`, met de oorspronkelijke
