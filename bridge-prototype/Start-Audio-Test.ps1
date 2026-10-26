@@ -12,7 +12,7 @@ if ($Host.Name -like '*ISE*') {
 }
 $rbEngine = [IO.Path]::GetFullPath($EngineDll)
 if ((Get-FileHash -LiteralPath $rbEngine -Algorithm SHA256).Hash -ne
-    '4C3A6441A2CD50F797D99B1C5BCF0AAF198C7AD8CA2648196B530C2E3E58B12') {
+    '4C3A6441A2CD50F797D99B1C5B6CF0AAF198C7AD8CA2648196B530C2E3E58B12') {
     throw 'De DLL wijkt af van de bekende originele ReBirth-versie. Er wordt niets gestart.'
 }
 if (-not (Test-Path -LiteralPath $OutputFolder -PathType Container)) {
