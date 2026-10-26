@@ -1,0 +1,9 @@
+# Keep local proprietary installations, build products and test artifacts out.
+*.exe
+*.dll
+*.iso
+*.zip
+*.rar
+__pycache__/
+input-tests-*/
+verification/*-result.json
