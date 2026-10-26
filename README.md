@@ -53,6 +53,14 @@ daar ook Open, tien Idle-aanroepen, de sluitingscontrole, Close en het ontladen
 van de DLL succesvol doorlopen. Dat bewijst nog geen audio-overdracht naar een
 andere host; de renderproef en een Windows-test van de helper blijven nodig.
 
+De [renderhelper](bridge-prototype/render-README.md) heeft inmiddels ook negen
+echte renderaanroepen zonder song onder Wine doorlopen, met intacte buffers
+en normale afsluiting. De volgende proef is een opname van tien seconden met
+een echt geladen demonummer op Windows. De
+[PowerShell-starter](bridge-prototype/Start-Audio-Test.ps1) en
+[Windows-uitleg](bridge-prototype/TESTEN-WINDOWS.md) staan klaar. Er is nog geen
+geladen-song-opname of VST3 in Ableton gevalideerd.
+
 ## Testen op Windows 10
 
 1. Gebruik de complete originele map `C:\ReBirth RB-338`, met de oorspronkelijke

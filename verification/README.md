@@ -49,3 +49,27 @@ Initial bridge diagnostic results in the separate Wine/QEMU environment:
 
 These diagnostics exercise the exact legacy DLL under Wine; they are not
 native Windows 10 bridge tests or evidence of hosted music playback.
+
+Guarded render-helper results, 2026-10-26:
+
+- Nine real Drive calls with no panel/song passed under Wine/QEMU. All inputs
+  and canaries stayed intact; all 1,152 unserved sample-sentinel checks passed;
+  Close/FreeLibrary completed and original hashes were unchanged. The result
+  explicitly reports `audio_verified:false` and `music_identity_verified:false`.
+- An altered same-size DLL was refused before loading with error 23 and zero
+  Open/Drive calls. A held `ReWi` mutex was refused with exit 2 and zero
+  Open/Idle/Drive calls; the holding fixture was not terminated.
+- A utility fixture, without the original DLL or any engine call, exercised
+  guarded allocation/canary checks, frame-position conversion and the real WAV
+  writer. FFprobe recognized float32 stereo, 44,100 Hz, 10 seconds. Exact file
+  length, header, interleave and final-frame trim were checked.
+- Existing output was refused with error 80. Abrupt self-termination with exit
+  77 removed the armed delete-pending partial output. The overwrite-refusal run
+  emitted additional unresolved fontconfig/QEMU warnings; its expected refusal
+  and unchanged complete output were recorded separately.
+
+The binary in `bridge-prototype/bin/windows-x86` is the project's own test
+helper, not the original engine or a VST3. A loaded-demo capture and listening
+comparison on native Windows remain necessary. `Start-Audio-Test.ps1` parses
+and uses PowerShell 5.1-compatible APIs; its interactive Windows path has not
+been executed by the Linux checks.

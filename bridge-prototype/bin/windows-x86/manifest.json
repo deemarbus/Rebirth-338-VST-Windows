@@ -1,0 +1,11 @@
+{
+  "binary": "rebirth-render-probe.exe",
+  "sha256": "10ecb61e88da86840d40b0bd40d5c359e7ff92843106b4bfffa9925f378cf1ef",
+  "source": "../../render-probe.c",
+  "source_sha256": "db3775e5fbe92ed9ce09c7b9b6ad6a067667126588dd833657992b616e7d3126",
+  "architecture": "Windows x86 (PE32 console)",
+  "compiler": "Debian gcc-mingw-w64-i686-posix 14.2.0-19+27+b1",
+  "flags": "-std=c11 -Wall -Wextra -Werror -O2 -municode -static -ladvapi32 -lm",
+  "contains_original_ReBirth_binaries": false,
+  "validated": "Wine/QEMU no-panel/no-song calls and utility checks; native Windows song capture pending"
+}

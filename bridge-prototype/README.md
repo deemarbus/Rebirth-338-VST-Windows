@@ -110,3 +110,10 @@ external timeout also covers Wine startup before this diagnostic's main runs.
 Exit 0 means its bounded lifecycle completed; exit 2 is an explicit refusal;
 other exits are failures. No completed audio render is implied by any of these
 results.
+
+The genuine lifecycle run on 2026-10-26 completed under Wine/QEMU with exit 0:
+Open returned 1, all ten Idle calls returned, the close-permission byte was 1,
+Close returned, the DLL unloaded, and the original hash remained unchanged.
+Neither timeout fired. Stderr contained only the diagnostic's own stage log in
+this run, with no QEMU warning. No Drive, panel, song or audio operation was
+performed. This remains separate from native Windows validation.
