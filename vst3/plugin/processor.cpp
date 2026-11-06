@@ -51,7 +51,7 @@ tresult PLUGIN_API Processor::setupProcessing(ProcessSetup& setup) {
     }
     if (setup.processMode != kRealtime) { publish(OfflineUnsupported); return kResultFalse; }
     if (setup.symbolicSampleSize != kSample32 || setup.maxSamplesPerBlock <= 0 ||
-        setup.maxSamplesPerBlock > 2048) {
+        setup.maxSamplesPerBlock > 8192) {
         publish(BadProtocol); return kResultFalse;
     }
     const auto result = AudioEffect::setupProcessing(setup);
@@ -125,7 +125,7 @@ tresult PLUGIN_API Processor::setProcessing(TBool state) {
 }
 tresult PLUGIN_API Processor::process(ProcessData& data) {
     if (data.numSamples == 0) return kResultOk;
-    if (data.numSamples < 0 || data.numSamples > 2048 || data.symbolicSampleSize != kSample32)
+    if (data.numSamples < 0 || data.numSamples > 8192 || data.symbolicSampleSize != kSample32)
         return kInvalidArgument;
     if (!data.numOutputs || !data.outputs) return kResultOk;
     auto& output = data.outputs[0];

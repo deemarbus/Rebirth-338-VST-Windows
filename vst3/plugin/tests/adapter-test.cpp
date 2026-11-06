@@ -51,7 +51,7 @@ int main() {
         FakeTransport transport;
         const int sizes[] = {1, 17, 63, 65, 127, 511, 1023};
         int64_t project = 0;
-        std::vector<float> left(2048), right(2048);
+        std::vector<float> left(8192), right(8192);
         for (int block = 0; block < 200; ++block) {
             const int count = sizes[block % 7];
             transport.drain(a);
@@ -67,6 +67,14 @@ int main() {
         }
         require(a.underruns() == 0, "responsive fake worker underrun");
         require(a.status() == Playing, "playing status missing");
+
+        a.reset(43);
+        transport = {};
+        a.process(left.data(), right.data(), 3902, timing(true, 0),
+              [&](const RBRequest& r) { return transport.push(r); });
+        require(a.cursor() == 3902, "large host block was not processed");
+        require(transport.requests == 60, "large host block request count mismatch");
+        transport.drain(a);
 
         /* The transport changes at an offset unrelated to the engine block.
          * Old in-flight packets must never survive the generation boundary. */
