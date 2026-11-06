@@ -17,7 +17,21 @@ jobs:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4, pinned
       - name: Build and validate without original ReBirth assets
         shell: pwsh
-        run: ./vst3/build-windows.ps1 -BuildRoot "$env:RUNNER_TEMP/rebirth-vst3-build" -Package
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $buildRoot = "$env:RUNNER_TEMP/rebirth-vst3-build"
+          New-Item -ItemType Directory -Path "$buildRoot/logs" -Force | Out-Null
+          $transcript = "$buildRoot/logs/windows-build.log"
+          Start-Transcript -LiteralPath $transcript | Out-Null
+          try {
+            ./vst3/build-windows.ps1 -BuildRoot $buildRoot -Package
+          } finally {
+            Stop-Transcript | Out-Null
+            '### Windows build transcript' | Add-Content -LiteralPath $env:GITHUB_STEP_SUMMARY
+            '```text' | Add-Content -LiteralPath $env:GITHUB_STEP_SUMMARY
+            Get-Content -LiteralPath $transcript -Tail 600 | Add-Content -LiteralPath $env:GITHUB_STEP_SUMMARY
+            '```' | Add-Content -LiteralPath $env:GITHUB_STEP_SUMMARY
+          }
       - name: Retain build evidence
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4, pinned
