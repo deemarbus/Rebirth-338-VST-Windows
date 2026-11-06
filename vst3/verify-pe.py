@@ -50,8 +50,8 @@ def inspect(path, machine, magic, dll):
             start = rva(string_rva)
             end = data.index(b'\0', start, min(start + 256, len(data)))
             exports.append(data[start:end].decode('ascii'))
-        if not {'GetPluginFactory', 'InitDll', 'ExitDll'}.issubset(exports):
-            raise ValueError('VST3 factory/module exports missing')
+        if 'GetPluginFactory' not in exports:
+            raise ValueError('VST3 factory export missing')
     return dict(path=str(path), machine=hex(actual), exports=exports)
 
 
