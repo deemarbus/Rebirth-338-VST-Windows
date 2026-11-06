@@ -14,7 +14,7 @@ $BuildRoot = [IO.Path]::GetFullPath($BuildRoot)
 $rbLogs = Join-Path $BuildRoot 'logs'
 [IO.Directory]::CreateDirectory($rbLogs) | Out-Null
 function Invoke-Checked([string]$Program, [string[]]$ArgumentList) {
-    & $Program @ArgumentList
+    & $Program @ArgumentList 2>&1 | Tee-Object -FilePath (Join-Path $rbLogs 'build-commands.log') -Append
     if ($LASTEXITCODE -ne 0) { throw ($Program + ' failed with exit ' + $LASTEXITCODE) }
 }
 function Invoke-Logged([string]$Program, [string[]]$ArgumentList, [string]$LogFile) {
@@ -52,7 +52,7 @@ Invoke-Checked 'cmake' @('-S', (Join-Path $PSScriptRoot 'worker'), '-B', $rbWork
 Invoke-Checked 'cmake' @('--build', $rbWorkerBuild, '--config', 'Release', '--parallel', '4')
 Invoke-Logged 'ctest' @('--test-dir', $rbWorkerBuild, '-C', 'Release', '--output-on-failure', '--no-tests=error') (Join-Path $rbLogs 'worker-transport.log')
 $rbPluginBuild = Join-Path $BuildRoot 'plugin-x64'
-Invoke-Checked 'cmake' @('-S', (Join-Path $PSScriptRoot 'plugin'), '-B', $rbPluginBuild, '-G', 'Visual Studio 17 2022', '-A', 'x64', ('-DVST3_SDK_ROOT=' + $SdkRoot), '-DSMTG_USE_STATIC_CRT=ON', '-DSMTG_RUN_VST_VALIDATOR=OFF', '-DSMTG_CREATE_PLUGIN_LINK=OFF', '-DSMTG_CREATE_MODULE_INFO=OFF')
+Invoke-Checked 'cmake' @('-S', (Join-Path $PSScriptRoot 'plugin'), '-B', $rbPluginBuild, '-G', 'Visual Studio 17 2022', '-A', 'x64', ('-DVST3_SDK_ROOT=' + $SdkRoot), '-DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreaded', '-DSMTG_USE_STATIC_CRT=ON', '-DSMTG_RUN_VST_VALIDATOR=OFF', '-DSMTG_CREATE_PLUGIN_LINK=OFF', '-DSMTG_CREATE_MODULE_INFO=OFF')
 Invoke-Checked 'cmake' @('--build', $rbPluginBuild, '--config', 'Release', '--target', 'ReBirthBridge', 'validator', 'bridge-adapter-test', '--parallel', '4')
 Invoke-Logged 'ctest' @('--test-dir', $rbPluginBuild, '-C', 'Release', '-R', '^bridge-adapter$', '--output-on-failure', '--no-tests=error') (Join-Path $rbLogs 'adapter.log')
 $rbWorker = @(Get-ChildItem -LiteralPath $rbWorkerBuild -Filter 'rebirth-bridge-worker.exe' -File -Recurse)

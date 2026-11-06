@@ -25,6 +25,15 @@ jobs:
           Start-Transcript -LiteralPath $transcript | Out-Null
           try {
             ./vst3/build-windows.ps1 -BuildRoot $buildRoot -Package
+          } catch {
+            $detail = ($_ | Out-String)
+            $commands = "$buildRoot/logs/build-commands.log"
+            if (Test-Path -LiteralPath $commands) {
+              $detail += (Get-Content -LiteralPath $commands -Tail 80) -join "`n"
+            }
+            $escaped = $detail.Replace('%', '%25').Replace("`r", '%0D').Replace("`n", '%0A')
+            Write-Host "::error title=Native Windows build details::$escaped"
+            throw
           } finally {
             Stop-Transcript | Out-Null
             '### Windows build transcript' | Add-Content -LiteralPath $env:GITHUB_STEP_SUMMARY
