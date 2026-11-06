@@ -89,7 +89,7 @@ int main() {
               [&](const RBRequest& r) { return transport.push(r); });
         transport.drain(a);
         Timing changedTempo = timing(true, 128, 150.0);
-        changedTempo.quarterNotes = 128.0 * 120.0 / (60.0 * RB_SAMPLE_RATE);
+        changedTempo.quarterNotes = 128.0 * 120.0 / (60.0 * RB_SAMPLE_RATE) + 0.001;
         a.process(left.data(), right.data(), 64, changedTempo,
               [&](const RBRequest& r) { return transport.push(r); });
         require(a.status() == Playing, "tempo change interrupted continuous transport");
