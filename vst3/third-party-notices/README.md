@@ -5,6 +5,9 @@ The frontend uses the unchanged official Steinberg VST3 SDK 3.8.1, commit
 in `Steinberg-VST3-SDK-MIT.txt`. The SDK's trademark rules still apply; this
 project does not claim endorsement by Steinberg or by ReBirth's authors.
 
+The frontend statically links libsamplerate 0.2.2 for host-rate conversion.
+Its BSD 2-Clause license is included in `libsamplerate-BSD-2-Clause.txt`.
+
 The native Windows package is built using Visual Studio 2022/MSVC with static
 C runtime linkage. It contains this project's frontend and worker, with SDK
 code in the frontend. It does not contain the original ReBirth engine,

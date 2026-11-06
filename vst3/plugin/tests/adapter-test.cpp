@@ -1,5 +1,7 @@
 #include "../adapter.h"
+#include "../sample-rate-converter.h"
 #include <algorithm>
+#include <cmath>
 #include <cstdio>
 #include <deque>
 #include <stdexcept>
@@ -40,20 +42,79 @@ struct FakeTransport {
         }
     }
 };
-static Timing timing(bool play, int64_t sample, double tempo = 140.0) {
+static Timing timing(bool play, int64_t sample, double tempo = 140.0,
+                     double sampleRate = RB_SAMPLE_RATE) {
     Timing t;
     t.valid = true;
     t.playing = play;
     t.tempo = tempo;
+    t.sampleRate = sampleRate;
     t.projectSamples = sample;
-    t.quarterNotes = double(sample) * tempo / (60.0 * RB_SAMPLE_RATE);
+    t.quarterNotes = double(sample) * tempo / (60.0 * sampleRate);
     return t;
+}
+static void checkSampleRate(double hostRate) {
+    SampleRateConverter converter;
+    require(converter.configure(hostRate, 512), "supported sample rate rejected");
+    const int32_t totalOutputFrames = static_cast<int32_t>(hostRate);
+    std::vector<float> sourceLeft(SampleRateConverter::maxBlockFrames);
+    std::vector<float> sourceRight(SampleRateConverter::maxBlockFrames);
+    std::vector<float> outputLeft(512), outputRight(512), captured;
+    captured.reserve(totalOutputFrames);
+    uint64_t sourceFrame = 0;
+    while (static_cast<int32_t>(captured.size()) < totalOutputFrames) {
+        const int32_t outputFrames = std::min<int32_t>(512,
+            totalOutputFrames - static_cast<int32_t>(captured.size()));
+        const int32_t inputFrames = converter.inputFramesForOutput(outputFrames);
+        require(inputFrames >= 0 && inputFrames <= SampleRateConverter::maxBlockFrames,
+                "resampler source block exceeds scratch capacity");
+        for (int32_t i = 0; i < inputFrames; ++i) {
+            const double phase = 6.283185307179586 * 440.0 * (sourceFrame + i) / RB_SAMPLE_RATE;
+            sourceLeft[i] = sourceRight[i] = static_cast<float>(std::sin(phase));
+        }
+        sourceFrame += static_cast<uint64_t>(inputFrames);
+        int32_t generated = 0;
+        require(converter.process(sourceLeft.data(), sourceRight.data(), inputFrames,
+                    outputLeft.data(), outputRight.data(), outputFrames, generated),
+                "resampler failed to produce a complete block");
+        require(generated == outputFrames, "resampler output frame count mismatch");
+        captured.insert(captured.end(), outputLeft.begin(), outputLeft.begin() + generated);
+    }
+    const int32_t start = static_cast<int32_t>(hostRate / 10.0);
+    const int32_t end = totalOutputFrames - start;
+    unsigned int crossings = 0;
+    for (int32_t i = start + 1; i < end; ++i)
+        if (captured[i - 1] <= 0.0f && captured[i] > 0.0f) ++crossings;
+    const double measuredRate = crossings * hostRate / (end - start);
+    require(std::abs(measuredRate - 440.0) < 1.5,
+            "sample-rate conversion changed the test tone pitch");
+    require(converter.latencySamples() >= RB_LATENCY,
+            "host latency is below the engine latency");
 }
 int main() {
     try {
         Adapter a;
         a.reset(27);
         FakeTransport transport;
+        checkSampleRate(48000.0);
+        checkSampleRate(88200.0);
+        checkSampleRate(96000.0);
+        checkSampleRate(176400.0);
+        checkSampleRate(192000.0);
+        SampleRateConverter unsupportedRate;
+        require(!unsupportedRate.configure(32000.0, 512), "unsupported sample rate accepted");
+        a.reset(75);
+        transport = {};
+        std::array<float, 64> hostRateLeft {}, hostRateRight {};
+        a.process(hostRateLeft.data(), hostRateRight.data(), 64, timing(true, 0, 120.0, 48000.0),
+              [&](const RBRequest& r) { return transport.push(r); }, 70);
+        transport.drain(a);
+        a.process(hostRateLeft.data(), hostRateRight.data(), 64, timing(true, 70, 120.0, 48000.0),
+              [&](const RBRequest& r) { return transport.push(r); }, 70);
+        require(a.cursor() == 128 && a.status() == Playing,
+            "host-rate clock was mistaken for a seek");
+        a.reset(27);
+        transport = {};
         const int sizes[] = {1, 17, 63, 65, 127, 511, 1023};
         int64_t project = 0;
         std::vector<float> left(8192), right(8192);

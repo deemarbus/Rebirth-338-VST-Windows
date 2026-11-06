@@ -82,7 +82,10 @@ if ($Package) {
     [ordered]@{
         format = 1; source_commit = $rbSourceCommit; sdk_commit = $rbSdkCommit
         compiler = 'Visual Studio 2022 MSVC'; validator = 'passed'; engine_included = $false
-        ableton_tested = $false; sample_rate = 44100; tempo_bpm = 140; latency_samples = 4096
+        ableton_tested = $false; sample_rate = 44100
+        host_sample_rates = @(44100, 48000, 88200, 96000, 176400, 192000)
+        resampler = 'libsamplerate 0.2.2'; tempo_range_bpm = @(20, 500)
+        latency_engine_samples = 4096
         files = $rbFiles
     } | ConvertTo-Json -Depth 8 | Set-Content -LiteralPath (Join-Path $rbDist 'manifest.json') -Encoding UTF8
 }

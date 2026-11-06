@@ -7,13 +7,15 @@ Een geslaagde opname is nog geen test van deze nieuwe realtime koppeling.
 
 ## Grenzen van deze eerste versie
 
-- Windows x64, **44,1 kHz**, **20-500 BPM** (volgt Live), stereo en één actieve instantie.
+- Windows x64, ReBirth-engine op **44,1 kHz**; Live op **44,1, 48, 88,2, 96, 176,4 of 192 kHz**.
+- Live-tempo **20-500 BPM** wordt gevolgd; stereo en één actieve instantie.
 - Het originele ReBirth-paneel blijft nodig om een song te laden en op te slaan.
 - **Loop uit** in ReBirth en Live. Start in Live vanaf **maat 1**.
 - Play/Stop komen uit Live. De Play-knop van ReBirth bestuurt Live niet.
 - Geen MIDI-nootbesturing, parameterautomatisering of songopslag in het Live-project.
 - Geen offline export: neem de uitvoer in realtime op een audiospoor op.
-- De plug-in meldt 4.096 samples latentie (ongeveer 92,9 ms) aan de host.
+- De plug-in resamplet de 44,1-kHz engine-uitvoer naar de Live-rate met
+   libsamplerate en meldt ongeveer 92,9 ms, omgerekend naar host-samples.
   De werking van Live's latentiecompensatie moet nog op Windows worden getest.
 
 De plug-in toont ontbrekende verbindingen, ongeschikte instellingen en
@@ -65,7 +67,8 @@ Gebruik de bij elkaar horende plug-in en helper van dezelfde build.
    ```
 
 3. Open het originele ReBirth, laad de eerder hoorbare demo en zet Loop uit.
-4. Zet Live op 44,1 kHz en een tempo tussen 20 en 500 BPM en zet Live Loop uit. Plaats de complete
+4. Zet Live op een ondersteunde samplefrequentie en een tempo tussen 20 en
+   500 BPM; zet Live Loop uit. Plaats de complete
    `ReBirthBridge.vst3`-map in de VST3-map die Live scant, scan opnieuw en laad
    ReBirth Bridge op een MIDI-spoor. Open het plug-invenster en controleer de status.
 5. Zet de cursor van Live op maat 1 en druk in **Live** op Play. Controleer

@@ -156,7 +156,8 @@ int wmain(int argc, WCHAR **argv) {
     fprintf(stderr,
         "ReBirth-brug geopend. Laat dit venster open.\n"
         "1. Open de originele ReBirth-app en laad je song. Zet Loop UIT.\n"
-        "2. Gebruik in Ableton 44100 Hz en 20-500 BPM, zet Live Loop UIT.\n"
+        "2. Gebruik in Ableton een ondersteunde samplefrequentie en 20-500 BPM.\n"
+        "   De VST3 converteert Live-rate naar de 44,1-kHz engine. Zet Loop UIT.\n"
         "3. Laad de ReBirth Bridge VST3 en start met Live Play vanaf het begin.\n"
         "   De Play-knop in ReBirth bestuurt deze proef niet.\n"
         "   Een song sla je apart op in ReBirth, niet in de VST3-projectstatus.\n"

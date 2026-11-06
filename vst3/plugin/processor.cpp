@@ -47,7 +47,7 @@ tresult PLUGIN_API Processor::canProcessSampleSize(int32 size) {
 }
 tresult PLUGIN_API Processor::setupProcessing(ProcessSetup& setup) {
     configured_ = false;
-    if (!std::isfinite(setup.sampleRate) || std::abs(setup.sampleRate - RB_SAMPLE_RATE) > 0.001) {
+    if (!SampleRateConverter::isSupportedRate(setup.sampleRate)) {
         publish(BadRate); return kResultFalse;
     }
     if (setup.processMode != kRealtime) { publish(OfflineUnsupported); return kResultFalse; }
@@ -56,9 +56,17 @@ tresult PLUGIN_API Processor::setupProcessing(ProcessSetup& setup) {
         publish(BadProtocol); return kResultFalse;
     }
     const auto result = AudioEffect::setupProcessing(setup);
-    configured_ = result == kResultOk;
+    if (result != kResultOk) return result;
+    if (!sampleRateConverter_.configure(setup.sampleRate, setup.maxSamplesPerBlock)) {
+        publish(BadRate);
+        return kResultFalse;
+    }
+    hostSampleRate_ = setup.sampleRate;
+    latencySamples_ = sampleRateConverter_.latencySamples();
+    configured_ = true;
     return result;
 }
+uint32 PLUGIN_API Processor::getLatencySamples() { return latencySamples_; }
 void Processor::publish(Status status) {
     status_->store(status, std::memory_order_relaxed);
     if (shared_ && token_ && rb_load(&shared_->client_token) == token_)
@@ -111,7 +119,12 @@ void Processor::disconnectBridge() {
 }
 tresult PLUGIN_API Processor::setActive(TBool state) {
     if (state) connectBridge();
-    else { processing_ = false; disconnectBridge(); publish(Inactive); }
+    else {
+        processing_ = false;
+        sampleRateConverter_.reset();
+        disconnectBridge();
+        publish(Inactive);
+    }
     /* Scanning and opening a project remain valid without the original app.
      * The editor explicitly reports the missing backend; no sound is claimed. */
     return AudioEffect::setActive(state);
@@ -121,7 +134,11 @@ tresult PLUGIN_API Processor::setProcessing(TBool state) {
     if (state) {
         if (shared_) claim();
         else publish(MissingWorker);
-    } else { releaseLease(); publish(Inactive); }
+    } else {
+        releaseLease();
+        sampleRateConverter_.reset();
+        publish(Inactive);
+    }
     return AudioEffect::setProcessing(state);
 }
 tresult PLUGIN_API Processor::process(ProcessData& data) {
@@ -144,7 +161,7 @@ tresult PLUGIN_API Processor::process(ProcessData& data) {
     if (!rb_valid_header(shared_)) { publish(BadProtocol); return kResultOk; }
     const uint32_t heartbeat = rb_load(&shared_->heartbeat);
     if (heartbeat != lastHeartbeat_) { lastHeartbeat_ = heartbeat; heartbeatSamples_ = 0; }
-    else if (heartbeatSamples_ <= RB_SAMPLE_RATE * 3u)
+    else if (heartbeatSamples_ <= static_cast<uint32_t>(hostSampleRate_ * 3.0))
         heartbeatSamples_ += static_cast<uint32_t>(data.numSamples);
     const auto workerState = rb_load(&shared_->worker_state);
     if (heartbeatSamples_ > RB_SAMPLE_RATE * 3u ||
@@ -164,22 +181,33 @@ tresult PLUGIN_API Processor::process(ProcessData& data) {
         const auto& context = *data.processContext;
         const uint32 needed = ProcessContext::kProjectTimeMusicValid | ProcessContext::kTempoValid;
         timing.valid = (context.state & needed) == needed &&
-            std::isfinite(context.sampleRate) && std::abs(context.sampleRate - RB_SAMPLE_RATE) <= 0.001;
+            std::isfinite(context.sampleRate) &&
+            std::abs(context.sampleRate - hostSampleRate_) <= 0.001;
         timing.playing = (context.state & ProcessContext::kPlaying) != 0;
         timing.cycle = (context.state & ProcessContext::kCycleActive) != 0;
         timing.tempo = context.tempo;
+        timing.sampleRate = context.sampleRate;
         timing.quarterNotes = context.projectTimeMusic;
         timing.projectSamples = context.projectTimeSamples;
     }
     const bool ready = workerState == RB_READY || workerState == RB_PLAYING;
     if (!ready) timing.playing = false;
-    adapter_.process(left, right, data.numSamples, timing,
-        [this](const RBRequest& request) noexcept { return rb_push_request(shared_, &request); });
+    const int32 engineFrames = sampleRateConverter_.inputFramesForOutput(data.numSamples);
+    if (engineFrames < 0 || engineFrames > static_cast<int32>(engineLeft_.size())) {
+        publish(BadProtocol);
+        return kResultOk;
+    }
+    adapter_.process(engineLeft_.data(), engineRight_.data(), engineFrames, timing,
+        [this](const RBRequest& request) noexcept { return rb_push_request(shared_, &request); },
+        data.numSamples);
+    int32 convertedFrames = 0;
+    const bool conversionComplete = sampleRateConverter_.process(engineLeft_.data(),
+        engineRight_.data(), engineFrames, left, right, data.numSamples, convertedFrames);
     const uint32_t underruns = adapter_.underruns();
     const uint32_t delta = underruns - reportedUnderruns_;
     if (delta) InterlockedExchangeAdd(&shared_->underruns, static_cast<LONG>(delta));
     reportedUnderruns_ = underruns;
-    publish(adapter_.status());
+    publish(conversionComplete ? adapter_.status() : Underrun);
     if (workerState == RB_REARM_REQUIRED) publish(UnsupportedSeek);
     /* Non-silent finite output only. Setting the flags from actual samples
      * keeps idle/missing-worker processing silent in ordinary host scans. */

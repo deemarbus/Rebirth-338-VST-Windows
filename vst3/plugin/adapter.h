@@ -10,6 +10,7 @@ namespace RebirthBridge {
 struct Timing {
     bool valid = false, playing = false, cycle = false;
     double tempo = 140.0, quarterNotes = 0.0;
+    double sampleRate = RB_SAMPLE_RATE;
     int64_t projectSamples = 0;
 };
 
@@ -78,25 +79,30 @@ public:
 
     template <typename Push>
     void process(float* left, float* right, int32_t frames, const Timing& timing,
-                 Push&& push) noexcept {
+                 Push&& push, int32_t hostFrames = -1) noexcept {
         if (frames <= 0) return;
+        if (hostFrames < 0) hostFrames = frames;
+        if (hostFrames <= 0) return;
         const bool tempoValid = std::isfinite(timing.tempo) &&
             timing.tempo >= RB_MIN_TEMPO_MILLI / 1000.0 &&
             timing.tempo <= RB_MAX_TEMPO_MILLI / 1000.0;
+        const bool hostRateValid = std::isfinite(timing.sampleRate) && timing.sampleRate > 0.0;
         const double safeTempo = tempoValid ? timing.tempo : RB_DEFAULT_TEMPO_MILLI / 1000.0;
-        const double quartersPerSample = safeTempo / (60.0 * RB_SAMPLE_RATE);
-        const double positionTolerance = quartersPerSample * 2.0;
+        const double safeHostRate = hostRateValid ? timing.sampleRate : RB_SAMPLE_RATE;
+        const double engineQuartersPerSample = safeTempo / (60.0 * RB_SAMPLE_RATE);
+        const double hostQuartersPerSample = safeTempo / (60.0 * safeHostRate);
+        const double positionTolerance = hostQuartersPerSample * 2.0;
         const uint32_t tempoMilli = tempoValid
             ? static_cast<uint32_t>(std::llround(timing.tempo * 1000.0))
             : RB_DEFAULT_TEMPO_MILLI;
         Status blockError = Ready;
         if (protocolError_) blockError = BadProtocol;
         else if (!timing.valid || !std::isfinite(timing.tempo) ||
-                 !std::isfinite(timing.quarterNotes)) blockError = MissingContext;
+             !std::isfinite(timing.quarterNotes) || !hostRateValid) blockError = MissingContext;
         else if (!tempoValid) blockError = BadTempo;
         else if (timing.cycle) blockError = UnsupportedCycle;
         if (blockError == Ready && timing.playing && timing.quarterNotes >= 0.0 &&
-            timing.quarterNotes + frames * quartersPerSample >
+            timing.quarterNotes + hostFrames * hostQuartersPerSample >
                 double((std::numeric_limits<int32_t>::max)()) / RB_PPQ)
             blockError = BadProtocol;
 
@@ -104,7 +110,7 @@ public:
         if (active_ && blockError == Ready && timing.playing && haveLast_) {
             const double tempoDelta = std::abs(timing.tempo - lastTempo_);
             const double tempoTransitionTolerance = tempoDelta * lastFrames_ /
-                (60.0 * RB_SAMPLE_RATE);
+                (60.0 * safeHostRate);
             if (timing.projectSamples != lastProjectEnd_ ||
                 std::abs(timing.quarterNotes - lastQuarterEnd_) >
                     positionTolerance + tempoTransitionTolerance)
@@ -118,7 +124,7 @@ public:
 
         bool missedThisBlock = false;
         for (int32_t i = 0; i < frames; ++i) {
-            const double quarter = timing.quarterNotes + i * quartersPerSample;
+            const double quarter = timing.quarterNotes + i * engineQuartersPerSample;
             if (!active_ && timing.playing && blockError == Ready && quarter >= 0.0) {
                 if (quarter > positionTolerance) {
                     failedSeek_ = true;
@@ -149,7 +155,7 @@ public:
                 pending_.engine_frame = active_ ? engineFrame_ : 0;
                 pending_.playing = active_ ? 1u : 0u;
                 pending_.tempo_milli = tempoMilli;
-                if (!toPositionTicks(timing.quarterNotes + i * quartersPerSample,
+                if (!toPositionTicks(timing.quarterNotes + i * engineQuartersPerSample,
                                     pending_.position_ticks)) {
                     protocolError_ = true;
                     blockError = BadProtocol;
@@ -185,12 +191,12 @@ public:
         else if (timing.playing) status_ = WaitingForBarOne;
         else status_ = Ready;
         haveLast_ = timing.valid;
-        if (timing.projectSamples <= INT64_MAX - frames)
-            lastProjectEnd_ = timing.projectSamples + frames;
+        if (timing.projectSamples <= INT64_MAX - hostFrames)
+            lastProjectEnd_ = timing.projectSamples + hostFrames;
         else haveLast_ = false;
-        lastQuarterEnd_ = timing.quarterNotes + frames * quartersPerSample;
+        lastQuarterEnd_ = timing.quarterNotes + hostFrames * hostQuartersPerSample;
         if (timing.valid && std::isfinite(timing.tempo)) lastTempo_ = timing.tempo;
-        lastFrames_ = frames;
+        lastFrames_ = hostFrames;
     }
 private:
     struct Sample {

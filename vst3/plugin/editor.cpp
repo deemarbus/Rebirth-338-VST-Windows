@@ -41,7 +41,7 @@ const wchar_t* frontendText(std::uint32_t state) {
     case 6: return L"Zet Loop in Live uit. Herhalen wordt in deze proef nog niet ondersteund.";
     case 7: return L"Audio kwam te laat aan. Er zijn ontbrekende samples; stop en probeer opnieuw.";
     case 8: return L"De koppeling kreeg ongeldige gegevens. Stop en herstart de brug na normaal afsluiten.";
-    case 9: return L"Zet de samplefrequentie in Live op 44,1 kHz. Andere frequenties werken nog niet.";
+    case 9: return L"Live-samplefrequentie niet ondersteund. Gebruik 44,1, 48, 88,2, 96, 176,4 of 192 kHz.";
     case 10: return L"Offline export werkt nog niet. Neem de uitvoer in realtime op een audiospoor op.";
     case 11: return L"Start eerst de aparte ReBirth-brug en laad daarna deze plug-in opnieuw.";
     case 12: return L"Een andere plug-ininstantie gebruikt ReBirth. Deze proef ondersteunt maar een instantie.";
@@ -203,7 +203,7 @@ void StatusView::updateStatus() {
                 status_ = problem;
                 statusColor_ = warning;
             }
-            details_ = L"Latentie: 4096 samples (92,9 ms) | ontbrekende blokken: " +
+            details_ = L"Engine-latentie: 4096 samples @ 44,1 kHz (92,9 ms); hostlatentie schaalt mee | ontbrekende blokken: " +
                 std::to_wstring(read32(s->underruns)) + L" | enginefout: " +
                 std::to_wstring(read32(s->error));
         }
@@ -220,7 +220,7 @@ void StatusView::paint() {
     if (brush) { FillRect(dc, &area, brush); DeleteObject(brush); }
     SetBkMode(dc, TRANSPARENT);
     draw(dc, titleFont_, text, L"ReBirth Bridge - experimentele VST3", {20, 16, 660, 48});
-    draw(dc, bodyFont_, muted, L"44,1 kHz  |  Live-tempo 20-500 BPM  |  stereo  |  een instantie", {20, 52, 660, 76});
+    draw(dc, bodyFont_, muted, L"Engine 44,1 kHz  |  Live 44,1-192 kHz  |  tempo volgt Live  |  stereo", {20, 52, 660, 76});
     draw(dc, bodyFont_, statusColor_, status_.c_str(), {20, 94, 660, 145});
     draw(dc, bodyFont_, muted, details_.c_str(), {20, 154, 660, 195});
     draw(dc, bodyFont_, text,
