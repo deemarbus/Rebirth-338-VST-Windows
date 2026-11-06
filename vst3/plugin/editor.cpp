@@ -30,13 +30,13 @@ bool validHeader(const RBShared* s) {
     return read32(s->magic) == RB_IPC_MAGIC &&
         s->version == RB_IPC_VERSION && s->bytes == sizeof(RBShared) &&
         s->frames == RB_BLOCK_FRAMES && s->sample_rate == RB_SAMPLE_RATE &&
-        s->tempo_milli == RB_TEMPO_MILLI && s->latency == RB_LATENCY;
+        s->tempo_milli == RB_DEFAULT_TEMPO_MILLI && s->latency == RB_LATENCY;
 }
 
 const wchar_t* frontendText(std::uint32_t state) {
     switch (state) {
     case 3: return L"Live levert geen bruikbare transportinformatie. Stop en start opnieuw vanaf maat 1.";
-    case 4: return L"Zet het tempo in Live op exact 140 BPM. Andere tempi zijn nog niet ondersteund.";
+    case 4: return L"Stel Live in op een tempo tussen 20 en 500 BPM.";
     case 5: return L"Spoelen of starten halverwege wordt nog niet ondersteund. Stop en start vanaf maat 1.";
     case 6: return L"Zet Loop in Live uit. Herhalen wordt in deze proef nog niet ondersteund.";
     case 7: return L"Audio kwam te laat aan. Er zijn ontbrekende samples; stop en probeer opnieuw.";
@@ -183,7 +183,7 @@ void StatusView::updateStatus() {
             case RB_STARTING: status_ = L"De brug opent de originele engine. Wacht op het consolevenster."; break;
             case RB_NO_SONG: status_ = L"Open de originele ReBirth-app, laad een song en zet Loop uit."; break;
             case RB_READY:
-                status_ = L"Gereed. Zet Live op 140 BPM en start vanaf maat 1 met Play in Live.";
+                status_ = L"Gereed. Live-tempo wordt gevolgd. Start vanaf maat 1 met Play in Live.";
                 statusColor_ = good;
                 break;
             case RB_PLAYING:
@@ -220,7 +220,7 @@ void StatusView::paint() {
     if (brush) { FillRect(dc, &area, brush); DeleteObject(brush); }
     SetBkMode(dc, TRANSPARENT);
     draw(dc, titleFont_, text, L"ReBirth Bridge - experimentele VST3", {20, 16, 660, 48});
-    draw(dc, bodyFont_, muted, L"44,1 kHz  |  140 BPM  |  stereo  |  een instantie", {20, 52, 660, 76});
+    draw(dc, bodyFont_, muted, L"44,1 kHz  |  Live-tempo 20-500 BPM  |  stereo  |  een instantie", {20, 52, 660, 76});
     draw(dc, bodyFont_, statusColor_, status_.c_str(), {20, 94, 660, 145});
     draw(dc, bodyFont_, muted, details_.c_str(), {20, 154, 660, 195});
     draw(dc, bodyFont_, text,

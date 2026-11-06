@@ -13,6 +13,15 @@ struct Timing {
     int64_t projectSamples = 0;
 };
 
+inline bool toPositionTicks(double quarterNotes, int32_t& ticks) noexcept {
+    if (!std::isfinite(quarterNotes)) return false;
+    if (quarterNotes <= 0.0) { ticks = 0; return true; }
+    const double position = quarterNotes * RB_PPQ;
+    if (position > (std::numeric_limits<int32_t>::max)()) return false;
+    ticks = static_cast<int32_t>(position);
+    return true;
+}
+
 /* Pointer-free protocol adapter. No allocation, locks, waits, clock queries or
  * operating-system calls occur here. Replies are keyed per sample so transport
  * starts at non-64-aligned host offsets cannot replay another generation. */
@@ -69,14 +78,25 @@ public:
     void process(float* left, float* right, int32_t frames, const Timing& timing,
                  Push&& push) noexcept {
         if (frames <= 0) return;
-        constexpr double quartersPerSample = 140.0 / (60.0 * RB_SAMPLE_RATE);
-        constexpr double positionTolerance = quartersPerSample * 2.0;
+        const bool tempoValid = std::isfinite(timing.tempo) &&
+            timing.tempo >= RB_MIN_TEMPO_MILLI / 1000.0 &&
+            timing.tempo <= RB_MAX_TEMPO_MILLI / 1000.0;
+        const double safeTempo = tempoValid ? timing.tempo : RB_DEFAULT_TEMPO_MILLI / 1000.0;
+        const double quartersPerSample = safeTempo / (60.0 * RB_SAMPLE_RATE);
+        const double positionTolerance = quartersPerSample * 2.0;
+        const uint32_t tempoMilli = tempoValid
+            ? static_cast<uint32_t>(std::llround(timing.tempo * 1000.0))
+            : RB_DEFAULT_TEMPO_MILLI;
         Status blockError = Ready;
         if (protocolError_) blockError = BadProtocol;
         else if (!timing.valid || !std::isfinite(timing.tempo) ||
                  !std::isfinite(timing.quarterNotes)) blockError = MissingContext;
-        else if (std::abs(timing.tempo - 140.0) > 0.0001) blockError = BadTempo;
+        else if (!tempoValid) blockError = BadTempo;
         else if (timing.cycle) blockError = UnsupportedCycle;
+        if (blockError == Ready && timing.playing && timing.quarterNotes >= 0.0 &&
+            timing.quarterNotes + frames * quartersPerSample >
+                double((std::numeric_limits<int32_t>::max)()) / RB_PPQ)
+            blockError = BadProtocol;
 
         if (!timing.playing) failedSeek_ = failedQueue_ = false;
         if (active_ && blockError == Ready && timing.playing && haveLast_) {
@@ -122,6 +142,16 @@ public:
                 pending_.stream_sample = cursor_;
                 pending_.engine_frame = active_ ? engineFrame_ : 0;
                 pending_.playing = active_ ? 1u : 0u;
+                pending_.tempo_milli = tempoMilli;
+                if (!toPositionTicks(timing.quarterNotes + i * quartersPerSample,
+                                    pending_.position_ticks)) {
+                    protocolError_ = true;
+                    blockError = BadProtocol;
+                    pending_.position_ticks = 0;
+                    pending_.playing = 0;
+                    pending_.engine_frame = 0;
+                    if (active_) stopEpoch();
+                }
             }
             if (++partial_ == RB_BLOCK_FRAMES) {
                 const int outcome = push(pending_);

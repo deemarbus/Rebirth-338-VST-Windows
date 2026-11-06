@@ -7,7 +7,7 @@ Een geslaagde opname is nog geen test van deze nieuwe realtime koppeling.
 
 ## Grenzen van deze eerste versie
 
-- Windows x64, **44,1 kHz**, **140 BPM**, stereo en één actieve instantie.
+- Windows x64, **44,1 kHz**, **20-500 BPM** (volgt Live), stereo en één actieve instantie.
 - Het originele ReBirth-paneel blijft nodig om een song te laden en op te slaan.
 - **Loop uit** in ReBirth en Live. Start in Live vanaf **maat 1**.
 - Play/Stop komen uit Live. De Play-knop van ReBirth bestuurt Live niet.
@@ -65,7 +65,7 @@ Gebruik de bij elkaar horende plug-in en helper van dezelfde build.
    ```
 
 3. Open het originele ReBirth, laad de eerder hoorbare demo en zet Loop uit.
-4. Zet Live op 44,1 kHz en 140 BPM en zet Live Loop uit. Plaats de complete
+4. Zet Live op 44,1 kHz en een tempo tussen 20 en 500 BPM en zet Live Loop uit. Plaats de complete
    `ReBirthBridge.vst3`-map in de VST3-map die Live scant, scan opnieuw en laad
    ReBirth Bridge op een MIDI-spoor. Open het plug-invenster en controleer de status.
 5. Zet de cursor van Live op maat 1 en druk in **Live** op Play. Controleer

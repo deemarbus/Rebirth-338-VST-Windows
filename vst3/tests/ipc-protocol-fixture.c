@@ -20,7 +20,7 @@ static void header_initialize(RBShared *s) {
     s->bytes = sizeof(*s);
     s->frames = RB_BLOCK_FRAMES;
     s->sample_rate = RB_SAMPLE_RATE;
-    s->tempo_milli = RB_TEMPO_MILLI;
+    s->tempo_milli = RB_DEFAULT_TEMPO_MILLI;
     s->latency = RB_LATENCY;
     rb_store(&s->magic, RB_IPC_MAGIC);
 }
@@ -32,6 +32,8 @@ static RBRequest make_request(uint32_t sequence) {
     request.stream_sample = UINT64_C(0x100000000) + (uint64_t)sequence * RB_BLOCK_FRAMES;
     request.engine_frame = (uint64_t)sequence * RB_BLOCK_FRAMES;
     request.playing = sequence & 1u;
+    request.tempo_milli = RB_DEFAULT_TEMPO_MILLI;
+    request.position_ticks = (int32_t)(sequence * 2u);
     return request;
 }
 

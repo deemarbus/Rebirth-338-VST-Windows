@@ -21,10 +21,11 @@ static uint32_t worker_ready_state(const Host *host) {
  * 64-frame advances. Epoch changes discard the old run; no untested seek
  * selector or position-chase flag is sent to the original engine. */
 static BOOL worker_request_metadata_valid(const RBRequest *request) {
-    int32_t ignored;
     if (!request->client_token || !request->epoch || request->reserved ||
         request->playing > 1 || request->stream_sample > UINT64_MAX - FRAMES ||
-        !frame_position(request->engine_frame, &ignored) ||
+        request->tempo_milli < RB_MIN_TEMPO_MILLI ||
+        request->tempo_milli > RB_MAX_TEMPO_MILLI || request->position_ticks < 0 ||
+        request->engine_frame > UINT64_MAX - RB_BLOCK_FRAMES ||
         (!request->playing && request->engine_frame != 0)) return FALSE;
     return TRUE;
 }
@@ -90,7 +91,7 @@ int wmain(int argc, WCHAR **argv) {
     shared->bytes = (uint32_t)sizeof(*shared);
     shared->frames = RB_BLOCK_FRAMES;
     shared->sample_rate = RB_SAMPLE_RATE;
-    shared->tempo_milli = RB_TEMPO_MILLI;
+    shared->tempo_milli = RB_DEFAULT_TEMPO_MILLI;
     shared->latency = RB_LATENCY;
     shared->worker_pid = GetCurrentProcessId();
     worker_status(shared, RB_STARTING, ERROR_SUCCESS);
@@ -155,7 +156,7 @@ int wmain(int argc, WCHAR **argv) {
     fprintf(stderr,
         "ReBirth-brug geopend. Laat dit venster open.\n"
         "1. Open de originele ReBirth-app en laad je song. Zet Loop UIT.\n"
-        "2. Gebruik in Ableton 44100 Hz en 140 BPM, zet Live Loop UIT.\n"
+        "2. Gebruik in Ableton 44100 Hz en 20-500 BPM, zet Live Loop UIT.\n"
         "3. Laad de ReBirth Bridge VST3 en start met Live Play vanaf het begin.\n"
         "   De Play-knop in ReBirth bestuurt deze proef niet.\n"
         "   Een song sla je apart op in ReBirth, niet in de VST3-projectstatus.\n"
@@ -199,7 +200,8 @@ int wmain(int argc, WCHAR **argv) {
              * Between valid playing jobs only Idle runs, never an implicit STOP. */
             if (!run.playing || request.epoch != run.epoch ||
                 rb_run_decide(&run, &request, RB_READY) != RB_RUN_PLAY) {
-                served = drive_checked(&host, FALSE, 0, -1);
+                served = drive_checked_at_position(&host, FALSE, request.tempo_milli,
+                                                   request.position_ticks, -1);
                 if (served < 0) { error = ERROR_INVALID_DATA; goto loop_failed; }
             }
             reply.client_token = request.client_token;
@@ -214,7 +216,8 @@ int wmain(int argc, WCHAR **argv) {
                 if (reply.state == RB_READY) reply.state = RB_REARM_REQUIRED;
                 InterlockedIncrement(&shared->rejected);
             } else if (action == RB_RUN_PLAY) {
-                served = drive_checked(&host, TRUE, request.engine_frame, CHANNELS);
+                served = drive_checked_at_position(&host, TRUE, request.tempo_milli,
+                                                   request.position_ticks, CHANNELS);
                 if (served < 0) { error = ERROR_INVALID_DATA; goto loop_failed; }
                 memcpy(reply.left, host.audio[0].data, sizeof(reply.left));
                 memcpy(reply.right, host.audio[1].data, sizeof(reply.right));

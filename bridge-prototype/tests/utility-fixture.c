@@ -31,6 +31,12 @@ int wmain(int argc, WCHAR **argv) {
         !frame_position(44100, &ticks) || ticks != 448 ||
         !frame_position(441000, &ticks) || ticks != 4480 ||
         frame_position(UINT64_MAX, &ticks)) return utility_failure("frame_clock");
+    if (!frame_position_for_tempo(44100, 20000, &ticks) || ticks != 64 ||
+        !frame_position_for_tempo(44100, 120000, &ticks) || ticks != 384 ||
+        !frame_position_for_tempo(44100, 500000, &ticks) || ticks != 1600 ||
+        frame_position_for_tempo(44100, 19999, &ticks) ||
+        frame_position_for_tempo(44100, 500001, &ticks))
+        return utility_failure("variable_tempo_frame_clock");
     for (sample = 0; sample < FRAMES; ++sample) {
         float left = (float)sample / 128.0f - 0.25f;
         float right = -left * 0.5f + 0.0625f;

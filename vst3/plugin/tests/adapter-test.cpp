@@ -14,8 +14,12 @@ static void require(bool ok, const char* message) {
 struct FakeTransport {
     std::deque<RBReply> replies;
     uint64_t requests = 0;
+    uint32_t lastTempoMilli = 0;
+    int32_t lastPositionTicks = -1;
     int push(const RBRequest& request) {
         ++requests;
+        lastTempoMilli = request.tempo_milli;
+        lastPositionTicks = request.position_ticks;
         RBReply reply {};
         reply.client_token = request.client_token;
         reply.epoch = request.epoch;
@@ -36,12 +40,13 @@ struct FakeTransport {
         }
     }
 };
-static Timing timing(bool play, int64_t sample) {
+static Timing timing(bool play, int64_t sample, double tempo = 140.0) {
     Timing t;
     t.valid = true;
     t.playing = play;
+    t.tempo = tempo;
     t.projectSamples = sample;
-    t.quarterNotes = double(sample) * 140.0 / (60.0 * RB_SAMPLE_RATE);
+    t.quarterNotes = double(sample) * tempo / (60.0 * RB_SAMPLE_RATE);
     return t;
 }
 int main() {
@@ -70,10 +75,26 @@ int main() {
 
         a.reset(43);
         transport = {};
-        a.process(left.data(), right.data(), 3902, timing(true, 0),
+        a.process(left.data(), right.data(), 3902, timing(true, 0, 120.0),
               [&](const RBRequest& r) { return transport.push(r); });
         require(a.cursor() == 3902, "large host block was not processed");
         require(transport.requests == 60, "large host block request count mismatch");
+        require(transport.lastTempoMilli == 120000, "120 BPM was not sent to worker");
+        require(transport.lastPositionTicks == 32, "120 BPM request position mismatch");
+        transport.drain(a);
+
+        a.reset(67);
+        transport = {};
+        a.process(left.data(), right.data(), 128, timing(true, 0, 120.0),
+              [&](const RBRequest& r) { return transport.push(r); });
+        transport.drain(a);
+        Timing changedTempo = timing(true, 128, 150.0);
+        changedTempo.quarterNotes = 128.0 * 120.0 / (60.0 * RB_SAMPLE_RATE);
+        a.process(left.data(), right.data(), 64, changedTempo,
+              [&](const RBRequest& r) { return transport.push(r); });
+        require(a.status() == Playing, "tempo change interrupted continuous transport");
+        require(transport.lastTempoMilli == 150000, "updated BPM was not sent to worker");
+        require(transport.lastPositionTicks == 1, "tempo change lost absolute position");
         transport.drain(a);
 
         /* The transport changes at an offset unrelated to the engine block.
@@ -103,7 +124,7 @@ int main() {
         a.process(left.data(), right.data(), 1, timing(false, 0),
                   [&](const RBRequest& r) { return transport.push(r); });
         Timing bad = timing(true, 0);
-        bad.tempo = 120;
+        bad.tempo = 600;
         a.process(left.data(), right.data(), 65, bad,
                   [&](const RBRequest& r) { return transport.push(r); });
         require(a.status() == BadTempo, "unsupported tempo not rejected");

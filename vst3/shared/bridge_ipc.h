@@ -13,8 +13,10 @@ typedef int32_t RBAtomic32; /* Layout-only use in portable tests. */
 #endif
 #define RB_IPC_NAME L"Local\\ReBirth338Bridge.v1"
 #define RB_IPC_MAGIC UINT32_C(0x52423338)
-enum { RB_IPC_VERSION = 1, RB_RING_CAPACITY = 128, RB_BLOCK_FRAMES = 64,
-       RB_SAMPLE_RATE = 44100, RB_TEMPO_MILLI = 140000, RB_LATENCY = 4096 };
+enum { RB_IPC_VERSION = 2, RB_RING_CAPACITY = 128, RB_BLOCK_FRAMES = 64,
+       RB_SAMPLE_RATE = 44100, RB_PPQ = 192, RB_DEFAULT_TEMPO_MILLI = 140000,
+       RB_MIN_TEMPO_MILLI = 20000, RB_MAX_TEMPO_MILLI = 500000,
+       RB_LATENCY = 4096 };
 enum RBWorkerState { RB_STARTING = 0, RB_NO_SONG = 1, RB_READY = 2,
                      RB_PLAYING = 3, RB_LOOP_ON = 4, RB_STOPPING = 5,
                      RB_FAILED = 6, RB_STOPPED = 7, RB_REARM_REQUIRED = 8 };
@@ -23,6 +25,8 @@ typedef struct {
     uint32_t client_token, epoch;
     uint64_t stream_sample, engine_frame;
     uint32_t playing, reserved;
+    uint32_t tempo_milli;
+    int32_t position_ticks;
 } RBRequest;
 typedef struct {
     uint32_t client_token, epoch;
@@ -47,11 +51,11 @@ typedef struct {
 #define RB_ASSERT _Static_assert
 #endif
 RB_ASSERT(sizeof(RBAtomic32) == 4, "32-bit interlocked fields required");
-RB_ASSERT(sizeof(RBRequest) == 32, "request ABI");
+RB_ASSERT(sizeof(RBRequest) == 40, "request ABI");
 RB_ASSERT(sizeof(RBReply) == 544, "reply ABI");
 RB_ASSERT(offsetof(RBShared, requests) == 128, "shared header ABI");
-RB_ASSERT(offsetof(RBShared, replies) == 4224, "reply ring ABI");
-RB_ASSERT(sizeof(RBShared) == 73856, "shared mapping ABI");
+RB_ASSERT(offsetof(RBShared, replies) == 5248, "reply ring ABI");
+RB_ASSERT(sizeof(RBShared) == 74880, "shared mapping ABI");
 #ifdef _WIN32
 static inline uint32_t rb_load(volatile RBAtomic32 *field) {
     return (uint32_t)InterlockedCompareExchange(field, 0, 0);
@@ -63,7 +67,7 @@ static inline int rb_valid_header(RBShared *shared) {
     return rb_load(&shared->magic) == RB_IPC_MAGIC &&
         shared->version == RB_IPC_VERSION && shared->bytes == sizeof(RBShared) &&
         shared->frames == RB_BLOCK_FRAMES && shared->sample_rate == RB_SAMPLE_RATE &&
-        shared->tempo_milli == RB_TEMPO_MILLI && shared->latency == RB_LATENCY;
+        shared->tempo_milli == RB_DEFAULT_TEMPO_MILLI && shared->latency == RB_LATENCY;
 }
 /* Called during lifecycle activation, with bounded contention retries even
  * when a host activates processing from its render thread. A generation belongs to

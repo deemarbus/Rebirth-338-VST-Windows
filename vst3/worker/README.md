@@ -1,7 +1,7 @@
 # Persistent x86 backend
 
-This is a prototype for one exact original ReBirth engine, stereo at 44,100 Hz
-and 140 BPM. It reuses the guarded diagnostic implementation by including its
+This is a prototype for one exact original ReBirth engine, stereo at 44,100 Hz,
+following Live tempo from 20 to 500 BPM. It reuses the guarded diagnostic implementation by including its
 source with the diagnostic entry point renamed. The original EXE/DLL, songs
 and ISO are never supplied, installed, modified or registered by this worker.
 
@@ -12,7 +12,7 @@ Run the worker before opening the original panel:
 ```
 
 Keep its console open. Load the song in the original ReBirth panel and turn
-panel Loop off. Use Live at 44,100 Hz and 140 BPM, with Live Loop off, and
+panel Loop off. Use Live at 44,100 Hz and 20-500 BPM, with Live Loop off, and
 start its transport from the beginning. The original Play button does not
 control Live. Save songs separately in ReBirth; project state does not embed
 the original song.

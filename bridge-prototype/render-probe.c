@@ -27,7 +27,8 @@ _Static_assert(sizeof(void *) == 4, "The legacy ABI requires x86 pointers.");
 _Static_assert(sizeof(float) == 4, "The engine writes IEEE float32 samples.");
 
 enum { DRIVE_SIZE = 0x11c8, FRAMES = 64, CHANNELS = 2, SAMPLE_RATE = 44100,
-       TEMPO = 140000, PPQ = 192, CAPTURE_FRAMES = 441000,
+    TEMPO = 140000, TEMPO_MIN = 20000, TEMPO_MAX = 500000,
+    PPQ = 192, CAPTURE_FRAMES = 441000,
        CAPTURE_BLOCKS = 6891, CANARY_SIZE = 64, SMOKE_BLOCKS = 8,
        NATIVE_TIMEOUT_MS = 10000, SETUP_TIMEOUT_MS = 300000,
        RENDER_TIMEOUT_MS = 60000, CLOSE_TIMEOUT_MS = 180000 };
@@ -259,22 +260,29 @@ static BOOL call_close_ok(Host *host, BOOL *allowed) {
     return !host->buffers_safe || integrity(host);
 }
 /* Exact integer frame-clock conversion avoids accumulating rounded tick steps. */
-static BOOL frame_position(uint64_t frames, int32_t *position) {
-    const uint64_t multiplier = (uint64_t)TEMPO * PPQ;
+static BOOL frame_position_for_tempo(uint64_t frames, uint32_t tempo_milli,
+                                     int32_t *position) {
+    uint64_t multiplier;
     uint64_t ticks;
+    if (tempo_milli < TEMPO_MIN || tempo_milli > TEMPO_MAX) return FALSE;
+    multiplier = (uint64_t)tempo_milli * PPQ;
     if (frames > UINT64_MAX / multiplier) return FALSE;
     ticks = frames * multiplier / ((uint64_t)60000 * SAMPLE_RATE);
     if (ticks > INT32_MAX) return FALSE;
     *position = (int32_t)ticks;
     return TRUE;
 }
+static BOOL frame_position(uint64_t frames, int32_t *position) {
+    return frame_position_for_tempo(frames, TEMPO, position);
+}
 /* Returns 0 for no song, 2 for validated stereo, -1 for any hard failure.
  * Every served sample is checked, including the final 24 frames not written. */
-static int drive_block(Host *host, BOOL play, uint64_t frames) {
-    int32_t position;
+static int drive_block_at_position(Host *host, BOOL play, uint32_t tempo_milli,
+                                  int32_t position) {
     unsigned int channel, sample;
     int served = 0;
-    if (!host->drive_enabled || !host->buffers_safe || !frame_position(frames, &position)) goto failed;
+    if (!host->drive_enabled || !host->buffers_safe || position < 0 ||
+        tempo_milli < TEMPO_MIN || tempo_milli > TEMPO_MAX) goto failed;
     if (!integrity(host)) goto failed;
     guarded_reset_canaries(&host->drive);
     for (channel = 0; channel < CHANNELS; ++channel) {
@@ -284,7 +292,7 @@ static int drive_block(Host *host, BOOL play, uint64_t frames) {
     }
     put32(host->drive.data, O_FRAMES, FRAMES);
     put32(host->drive.data, O_POSITION, (uint32_t)position);
-    put32(host->drive.data, O_TEMPO, TEMPO);
+    put32(host->drive.data, O_TEMPO, tempo_milli);
     put32(host->drive.data, O_PLAY, play ? 1 : 0);
     /* Clear only established one-shot request outputs. Persistent feedback
      * and native-cleared served/count fields are not invented host inputs. */
@@ -349,7 +357,15 @@ failed:
     host->drive_enabled = FALSE;
     return -1;
 }
-static BOOL feedback(Host *host, BOOL capturing) {
+static int drive_block(Host *host, BOOL play, uint64_t frames) {
+    int32_t position;
+    if (!frame_position(frames, &position)) {
+        host->drive_enabled = FALSE;
+        return -1;
+    }
+    return drive_block_at_position(host, play, TEMPO, position);
+}
+static BOOL feedback_at_tempo(Host *host, BOOL capturing, uint32_t tempo_milli) {
     BYTE *p = host->drive.data;
     BYTE play = p[O_PLAY_REQUEST], seek = p[O_SEEK_REQUEST];
     if (play > 2) {
@@ -371,10 +387,10 @@ static BOOL feedback(Host *host, BOOL capturing) {
     if (host->latest_served == CHANNELS) {
         uint32_t tempo = get32(p, O_TEMPO_FEEDBACK);
         BYTE loop = p[O_LOOP_ENABLED];
-        if (tempo != TEMPO) ++host->tempo_differences;
+        if (tempo != tempo_milli) ++host->tempo_differences;
         if (tempo != host->last_tempo) {
-            fprintf(stderr, "feedback tempo=%lu fixed_host_tempo=%u policy=host_140_BPM\n",
-                    (unsigned long)tempo, TEMPO);
+            fprintf(stderr, "feedback tempo=%lu host_tempo=%u policy=follow_host_tempo\n",
+                (unsigned long)tempo, tempo_milli);
             host->last_tempo = tempo;
         }
         if ((int)loop != host->last_loop) {
@@ -387,11 +403,26 @@ static BOOL feedback(Host *host, BOOL capturing) {
     }
     return TRUE;
 }
+static BOOL feedback(Host *host, BOOL capturing) {
+    return feedback_at_tempo(host, capturing, TEMPO);
+}
 
 static int drive_checked(Host *host, BOOL play, uint64_t frames, int expected_served) {
     int served = drive_block(host, play, frames);
     if (served < 0 || (expected_served >= 0 && served != expected_served) ||
         !feedback(host, play)) {
+        host->drive_enabled = FALSE;
+        fprintf(stderr, "Drive validation failed; expected_served=%d actual=%d; Drive disabled\n",
+                expected_served, served);
+        return -1;
+    }
+    return served;
+}
+static int drive_checked_at_position(Host *host, BOOL play, uint32_t tempo_milli,
+                                     int32_t position, int expected_served) {
+    int served = drive_block_at_position(host, play, tempo_milli, position);
+    if (served < 0 || (expected_served >= 0 && served != expected_served) ||
+        !feedback_at_tempo(host, play, tempo_milli)) {
         host->drive_enabled = FALSE;
         fprintf(stderr, "Drive validation failed; expected_served=%d actual=%d; Drive disabled\n",
                 expected_served, served);

@@ -28,6 +28,7 @@ Processor::~Processor() { disconnectBridge(); }
 tresult PLUGIN_API Processor::initialize(FUnknown* context) {
     const auto result = AudioEffect::initialize(context);
     if (result != kResultOk) return result;
+    addEventInput(STR16("MIDI In"), 16);
     addAudioOutput(STR16("ReBirth stereo"), SpeakerArr::kStereo);
     return kResultOk;
 }
