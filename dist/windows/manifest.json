@@ -1,0 +1,89 @@
+{
+  "format": 1,
+  "source_commit": "8464f6925a8c695a3d5790d2c832f9a540b338a0",
+  "sdk_commit": "3cdf9ca5d1f5b1b21e0a86832aa4abe55607bd96",
+  "compiler": "Visual Studio 2022 MSVC",
+  "validator": "passed",
+  "engine_included": false,
+  "ableton_tested": false,
+  "sample_rate": 44100,
+  "tempo_bpm": 140,
+  "latency_samples": 4096,
+  "files": [
+    {
+      "path": "rebirth-bridge-worker.exe",
+      "sha256": "d17d1e1c5f1371b3d980509139a32fca4d8d875a101274c2dabfda00f856c6cb",
+      "bytes": 136192
+    },
+    {
+      "path": "ReBirthBridge.vst3/desktop.ini",
+      "sha256": "3f3d19c85c40231d4dec0c6526b77d8325031eb7d52fcf141d68feaa3a88547f",
+      "bytes": 44
+    },
+    {
+      "path": "ReBirthBridge.vst3/PlugIn.ico",
+      "sha256": "1dda09aceb9fa930a3894cce4ad57edd8fa48ce58157c97ba5f971d2d4e79821",
+      "bytes": 254170
+    },
+    {
+      "path": "ReBirthBridge.vst3/Contents/x86_64-win/ReBirthBridge.vst3",
+      "sha256": "4d6ad070f0fb2a92711c679a5fd09d787842f21fe8cf71d2e5fb9fef153b6f68",
+      "bytes": 849920
+    },
+    {
+      "path": "third-party-notices/README.md",
+      "sha256": "d44229dc79c714645efa4a3352b88425d7b19ca5f919566cda6e0dd208f595d6",
+      "bytes": 912
+    },
+    {
+      "path": "third-party-notices/Steinberg-VST3-SDK-MIT.txt",
+      "sha256": "b99e03d84202686308ba0c6556fcdff70885897cab8a87c02e75e4964a29aa76",
+      "bytes": 1116
+    },
+    {
+      "path": "verification/adapter.log",
+      "sha256": "10f467a363bb9d09e603f6faaade51e7585b4bdfdf1566b82611d281fc05f1d3",
+      "bytes": 321
+    },
+    {
+      "path": "verification/build-commands.log",
+      "sha256": "2b3ca2c78aa41d5b062c413ec08a0d11705b72a0572c0c6433cfd37698648741",
+      "bytes": 13423
+    },
+    {
+      "path": "verification/ipc-Win32.log",
+      "sha256": "8b9408fb934566b2b0e007d104c6f1935fd5c53eab44f5b142ab0d726c9128af",
+      "bytes": 320
+    },
+    {
+      "path": "verification/ipc-x64.log",
+      "sha256": "4fbda8ff06382f8da28d8d77776ae37aa799fb3094922af18e97f205f22958d3",
+      "bytes": 316
+    },
+    {
+      "path": "verification/pe-exports.log",
+      "sha256": "cb2e14bfa64995166260252fe8a145ea1ca272eccb44bd88da1a935b7e93e858",
+      "bytes": 340
+    },
+    {
+      "path": "verification/validator-plugin.log",
+      "sha256": "1b76a5d923d58bab4332c9e0ade3937c2fcd243dc177dcbd1a7849df49d09bd8",
+      "bytes": 9317
+    },
+    {
+      "path": "verification/validator-selftest.log",
+      "sha256": "9066292b961bbb5a3165d1175019d3cc352c1afba923ca632e6f536a7e950f39",
+      "bytes": 2898
+    },
+    {
+      "path": "verification/windows-build.log",
+      "sha256": "ae34482a757d39c2e75cd0ba8e36be0db69e8761071e1eab7be64bc8cd087cf3",
+      "bytes": 27901
+    },
+    {
+      "path": "verification/worker-transport.log",
+      "sha256": "6aa59a573b2b8257e4088fc3981fc66c2c79db0ec26036d636d4fb75ea7b896c",
+      "bytes": 330
+    }
+  ]
+}

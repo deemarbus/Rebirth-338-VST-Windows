@@ -1,0 +1,8 @@
+Internal ctest changing into directory: D:/a/_temp/rebirth-vst3-build/ipc-Win32
+Test project D:/a/_temp/rebirth-vst3-build/ipc-Win32
+    Start 1: rb-ipc-protocol
+1/1 Test #1: rb-ipc-protocol ..................   Passed    0.07 sec
+
+100% tests passed, 0 tests failed out of 1
+
+Total Test time (real) =   0.10 sec

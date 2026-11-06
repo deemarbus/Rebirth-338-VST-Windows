@@ -1,0 +1,1 @@
+{"plugin": {"path": "D:\\a\\_temp\\rebirth-vst3-build\\plugin-x64\\VST3\\Release\\ReBirthBridge.vst3\\Contents\\x86_64-win\\ReBirthBridge.vst3", "machine": "0x8664", "exports": ["GetPluginFactory"]}, "worker": {"path": "D:\\a\\_temp\\rebirth-vst3-build\\worker-x86\\Release\\rebirth-bridge-worker.exe", "machine": "0x14c", "exports": []}}

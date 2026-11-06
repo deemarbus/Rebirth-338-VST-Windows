@@ -1,0 +1,8 @@
+Internal ctest changing into directory: D:/a/_temp/rebirth-vst3-build/worker-x86
+Test project D:/a/_temp/rebirth-vst3-build/worker-x86
+    Start 1: worker-linear-transport
+1/1 Test #1: worker-linear-transport ..........   Passed    0.01 sec
+
+100% tests passed, 0 tests failed out of 1
+
+Total Test time (real) =   0.01 sec

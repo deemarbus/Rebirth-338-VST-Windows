@@ -1,0 +1,251 @@
+Cloning into 'D:\a\_temp\rebirth-vst3-build\vst3sdk'...
+HEAD is now at 3cdf9ca VST3 SDK 3.8.1
+Submodule 'base' (https://github.com/steinbergmedia/vst3_base) registered for path 'base'
+Submodule 'cmake' (https://github.com/steinbergmedia/vst3_cmake) registered for path 'cmake'
+Submodule 'pluginterfaces' (https://github.com/steinbergmedia/vst3_pluginterfaces) registered for path 'pluginterfaces'
+Submodule 'public.sdk' (https://github.com/steinbergmedia/vst3_public_sdk) registered for path 'public.sdk'
+Cloning into 'D:/a/_temp/rebirth-vst3-build/vst3sdk/base'...
+Cloning into 'D:/a/_temp/rebirth-vst3-build/vst3sdk/cmake'...
+Cloning into 'D:/a/_temp/rebirth-vst3-build/vst3sdk/pluginterfaces'...
+Cloning into 'D:/a/_temp/rebirth-vst3-build/vst3sdk/public.sdk'...
+Submodule path 'base': checked out 'fcf9da0bd27a16f7f03773a3a39822f28f5c8477'
+Submodule path 'cmake': checked out '054c9143cbb8d47fc4694e473f2ee3b4d951a8f5'
+Submodule path 'pluginterfaces': checked out '4f547e8e102b47de4a8b8aaf343c73b700786372'
+Submodule path 'public.sdk': checked out '586dc5e6c8012c3e4b01c79389375cbe96bdb1da'
+-- Selecting Windows SDK version 10.0.26100.0 to target Windows 10.0.20348.
+-- The C compiler identification is MSVC 19.44.35229.0
+-- Detecting C compiler ABI info
+-- Detecting C compiler ABI info - done
+-- Check for working C compiler: C:/Program Files/Microsoft Visual Studio/2022/Enterprise/VC/Tools/MSVC/14.44.35207/bin/Hostx64/x86/cl.exe - skipped
+-- Detecting C compile features
+-- Detecting C compile features - done
+-- Configuring done (11.7s)
+-- Generating done (0.0s)
+-- Build files have been written to: D:/a/_temp/rebirth-vst3-build/ipc-Win32
+MSBuild version 17.14.60+43b635718 for .NET Framework
+
+  1>Checking Build System
+  Building Custom Rule D:/a/Rebirth-338-VST-Windows/Rebirth-338-VST-Windows/vst3/tests/CMakeLists.txt
+  ipc-protocol-fixture.c
+  rb-ipc-tests.vcxproj -> D:\a\_temp\rebirth-vst3-build\ipc-Win32\Release\rb-ipc-tests.exe
+  Building Custom Rule D:/a/Rebirth-338-VST-Windows/Rebirth-338-VST-Windows/vst3/tests/CMakeLists.txt
+-- Selecting Windows SDK version 10.0.26100.0 to target Windows 10.0.20348.
+-- The C compiler identification is MSVC 19.44.35229.0
+-- Detecting C compiler ABI info
+-- Detecting C compiler ABI info - done
+-- Check for working C compiler: C:/Program Files/Microsoft Visual Studio/2022/Enterprise/VC/Tools/MSVC/14.44.35207/bin/Hostx64/x64/cl.exe - skipped
+-- Detecting C compile features
+-- Detecting C compile features - done
+-- Configuring done (3.6s)
+-- Generating done (0.0s)
+-- Build files have been written to: D:/a/_temp/rebirth-vst3-build/ipc-x64
+MSBuild version 17.14.60+43b635718 for .NET Framework
+
+  1>Checking Build System
+  Building Custom Rule D:/a/Rebirth-338-VST-Windows/Rebirth-338-VST-Windows/vst3/tests/CMakeLists.txt
+  ipc-protocol-fixture.c
+  rb-ipc-tests.vcxproj -> D:\a\_temp\rebirth-vst3-build\ipc-x64\Release\rb-ipc-tests.exe
+  Building Custom Rule D:/a/Rebirth-338-VST-Windows/Rebirth-338-VST-Windows/vst3/tests/CMakeLists.txt
+-- Selecting Windows SDK version 10.0.26100.0 to target Windows 10.0.20348.
+-- The C compiler identification is MSVC 19.44.35229.0
+-- Detecting C compiler ABI info
+-- Detecting C compiler ABI info - done
+-- Check for working C compiler: C:/Program Files/Microsoft Visual Studio/2022/Enterprise/VC/Tools/MSVC/14.44.35207/bin/Hostx64/x86/cl.exe - skipped
+-- Detecting C compile features
+-- Detecting C compile features - done
+-- Configuring done (3.9s)
+-- Generating done (0.0s)
+-- Build files have been written to: D:/a/_temp/rebirth-vst3-build/worker-x86
+MSBuild version 17.14.60+43b635718 for .NET Framework
+
+  1>Checking Build System
+  Building Custom Rule D:/a/Rebirth-338-VST-Windows/Rebirth-338-VST-Windows/vst3/worker/CMakeLists.txt
+  bridge-worker.c
+  Building Custom Rule D:/a/Rebirth-338-VST-Windows/Rebirth-338-VST-Windows/vst3/worker/CMakeLists.txt
+  worker-run-test.c
+  worker-run-test.vcxproj -> D:\a\_temp\rebirth-vst3-build\worker-x86\Release\worker-run-test.exe
+D:\a\Rebirth-338-VST-Windows\Rebirth-338-VST-Windows\bridge-prototype\render-probe.c(439,42): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details. [D:\a\_temp\rebirth-vst3-build\worker-x86\rebirth-bridge-worker.vcxproj]
+  (compiling source file '../../../Rebirth-338-VST-Windows/Rebirth-338-VST-Windows/vst3/worker/bridge-worker.c')
+  
+D:\a\Rebirth-338-VST-Windows\Rebirth-338-VST-Windows\bridge-prototype\render-probe.c(491,30): warning C4244: '=': conversion from 'BOOL' to 'BOOLEAN', possible loss of data [D:\a\_temp\rebirth-vst3-build\worker-x86\rebirth-bridge-worker.vcxproj]
+  (compiling source file '../../../Rebirth-338-VST-Windows/Rebirth-338-VST-Windows/vst3/worker/bridge-worker.c')
+  
+D:\a\Rebirth-338-VST-Windows\Rebirth-338-VST-Windows\bridge-prototype\render-probe.c(130,1): warning C4702: unreachable code [D:\a\_temp\rebirth-vst3-build\worker-x86\rebirth-bridge-worker.vcxproj]
+  rebirth-bridge-worker.vcxproj -> D:\a\_temp\rebirth-vst3-build\worker-x86\Release\rebirth-bridge-worker.exe
+  Building Custom Rule D:/a/Rebirth-338-VST-Windows/Rebirth-338-VST-Windows/vst3/worker/CMakeLists.txt
+-- Selecting Windows SDK version 10.0.26100.0 to target Windows 10.0.20348.
+-- The C compiler identification is MSVC 19.44.35229.0
+-- The CXX compiler identification is MSVC 19.44.35229.0
+-- Detecting C compiler ABI info
+-- Detecting C compiler ABI info - done
+-- Check for working C compiler: C:/Program Files/Microsoft Visual Studio/2022/Enterprise/VC/Tools/MSVC/14.44.35207/bin/Hostx64/x64/cl.exe - skipped
+-- Detecting C compile features
+-- Detecting C compile features - done
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Check for working CXX compiler: C:/Program Files/Microsoft Visual Studio/2022/Enterprise/VC/Tools/MSVC/14.44.35207/bin/Hostx64/x64/cl.exe - skipped
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
+-- [SMTG] SMTG_AAX_SDK_PATH is not set. If you need it, please download the AAX SDK!
+-- Could NOT find LIBJACK (missing: LIBJACK_LIBRARIES LIBJACK_INCLUDE_DIR) 
+-- Performing Test SMTG_USE_STDATOMIC_H
+-- Performing Test SMTG_USE_STDATOMIC_H - Failed
+-- Configuring done (6.9s)
+-- Generating done (0.1s)
+-- Build files have been written to: D:/a/_temp/rebirth-vst3-build/plugin-x64
+MSBuild version 17.14.60+43b635718 for .NET Framework
+
+  1>Checking Build System
+  Building Custom Rule D:/a/_temp/rebirth-vst3-build/vst3sdk/CMakeLists.txt
+  Building Custom Rule D:/a/_temp/rebirth-vst3-build/vst3sdk/CMakeLists.txt
+  baseiids.cpp
+  fbuffer.cpp
+  fdebug.cpp
+  fdynlib.cpp
+  fobject.cpp
+  conststringtable.cpp
+  coreiids.cpp
+  funknown.cpp
+  ustring.cpp
+  fstreamer.cpp
+  fstring.cpp
+  timer.cpp
+  updatehandler.cpp
+  pluginterfaces.vcxproj -> D:\a\_temp\rebirth-vst3-build\plugin-x64\lib\Release\pluginterfaces.lib
+  fcondition.cpp
+  flock.cpp
+  base.vcxproj -> D:\a\_temp\rebirth-vst3-build\plugin-x64\lib\Release\base.lib
+  Building Custom Rule D:/a/_temp/rebirth-vst3-build/vst3sdk/CMakeLists.txt
+  commoniids.cpp
+  commonstringconvert.cpp
+  openurl.cpp
+  systemclipboard_linux.cpp
+  systemclipboard_win32.cpp
+  threadchecker_linux.cpp
+  threadchecker_win32.cpp
+  readfile.cpp
+  vstpresetfile.cpp
+  sdk_common.vcxproj -> D:\a\_temp\rebirth-vst3-build\plugin-x64\lib\Release\sdk_common.lib
+  Building Custom Rule D:/a/_temp/rebirth-vst3-build/vst3sdk/CMakeLists.txt
+  pluginview.cpp
+  pluginfactory.cpp
+  moduleinit.cpp
+  dataexchange.cpp
+  stringconvert.cpp
+  systemtime.cpp
+  testing.cpp
+  vst2persistence.cpp
+  vstaudioeffect.cpp
+  vstbus.cpp
+  vstcomponent.cpp
+  vstcomponentbase.cpp
+  vsteditcontroller.cpp
+  vstinitiids.cpp
+  vstnoteexpressiontypes.cpp
+  vstparameters.cpp
+  vstrepresentation.cpp
+  sdk.vcxproj -> D:\a\_temp\rebirth-vst3-build\plugin-x64\lib\Release\sdk.lib
+  Building Custom Rule D:/a/Rebirth-338-VST-Windows/Rebirth-338-VST-Windows/vst3/plugin/CMakeLists.txt
+  processor.cpp
+  controller.cpp
+  editor.cpp
+  factory.cpp
+D:\a\_temp\rebirth-vst3-build\vst3sdk\public.sdk\source\main\pluginfactory_constexpr.h(72,62): warning C4458: declaration of 'iid' hides class member [D:\a\_temp\rebirth-vst3-build\plugin-x64\ReBirthBridge.vcxproj]
+  (compiling source file '../../../Rebirth-338-VST-Windows/Rebirth-338-VST-Windows/vst3/plugin/factory.cpp')
+      D:\a\_temp\rebirth-vst3-build\vst3sdk\pluginterfaces\base\ipluginbase.h(329,20):
+      see declaration of 'Steinberg::IPluginFactory2::iid'
+      D:\a\_temp\rebirth-vst3-build\vst3sdk\public.sdk\source\main\pluginfactory_constexpr.h(72,62):
+      the template instantiation context (the oldest one first) is
+          D:\a\Rebirth-338-VST-Windows\Rebirth-338-VST-Windows\vst3\plugin\factory.cpp(13,1):
+          see reference to class template instantiation 'Steinberg::PluginFactory<FactoryData>' being compiled
+          D:\a\_temp\rebirth-vst3-build\vst3sdk\public.sdk\source\main\pluginfactory_constexpr.h(72,21):
+          while compiling class template member function 'Steinberg::tresult Steinberg::PluginFactory<FactoryData>::createInstance(Steinberg::FIDString,Steinberg::FIDString,void **)'
+  
+D:\a\_temp\rebirth-vst3-build\vst3sdk\public.sdk\source\main\pluginfactory_constexpr.h(67,4): warning C4996: 'strncpy': This function or variable may be unsafe. Consider using strncpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details. [D:\a\_temp\rebirth-vst3-build\plugin-x64\ReBirthBridge.vcxproj]
+  (compiling source file '../../../Rebirth-338-VST-Windows/Rebirth-338-VST-Windows/vst3/plugin/factory.cpp')
+      D:\a\_temp\rebirth-vst3-build\vst3sdk\public.sdk\source\main\pluginfactory_constexpr.h(67,4):
+      the template instantiation context (the oldest one first) is
+          D:\a\_temp\rebirth-vst3-build\vst3sdk\public.sdk\source\main\pluginfactory_constexpr.h(58,21):
+          while compiling class template member function 'Steinberg::tresult Steinberg::PluginFactory<FactoryData>::getClassInfo(Steinberg::int32,Steinberg::PClassInfo *)'
+  
+D:\a\_temp\rebirth-vst3-build\vst3sdk\public.sdk\source\main\pluginfactory_constexpr.h(69,4): warning C4996: 'strncpy': This function or variable may be unsafe. Consider using strncpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details. [D:\a\_temp\rebirth-vst3-build\plugin-x64\ReBirthBridge.vcxproj]
+  (compiling source file '../../../Rebirth-338-VST-Windows/Rebirth-338-VST-Windows/vst3/plugin/factory.cpp')
+  
+  Generating Code...
+     Creating library D:/a/_temp/rebirth-vst3-build/plugin-x64/Release/ReBirthBridge.lib and object D:/a/_temp/rebirth-vst3-build/plugin-x64/Release/ReBirthBridge.exp
+  ReBirthBridge.vcxproj -> D:\a\_temp\rebirth-vst3-build\plugin-x64\VST3\Release\ReBirthBridge.vst3\Contents\x86_64-win\ReBirthBridge.vst3
+  [SMTG] Copy PlugIn.ico and desktop.ini and change their attributes.
+MSBuild version 17.14.60+43b635718 for .NET Framework
+
+  pluginterfaces.vcxproj -> D:\a\_temp\rebirth-vst3-build\plugin-x64\lib\Release\pluginterfaces.lib
+  base.vcxproj -> D:\a\_temp\rebirth-vst3-build\plugin-x64\lib\Release\base.lib
+  sdk_common.vcxproj -> D:\a\_temp\rebirth-vst3-build\plugin-x64\lib\Release\sdk_common.lib
+  Building Custom Rule D:/a/_temp/rebirth-vst3-build/vst3sdk/CMakeLists.txt
+  connectionproxy.cpp
+  eventlist.cpp
+  hostclasses.cpp
+  module.cpp
+  parameterchanges.cpp
+  pluginterfacesupport.cpp
+  processdata.cpp
+  stringconvert.cpp
+  vstinitiids.cpp
+  sdk_hosting.vcxproj -> D:\a\_temp\rebirth-vst3-build\plugin-x64\lib\Release\sdk_hosting.lib
+  Building Custom Rule D:/a/_temp/rebirth-vst3-build/vst3sdk/public.sdk/samples/vst-hosting/validator/CMakeLists.txt
+  memorystream.cpp
+  moduleinit.cpp
+  moduleinfoparser.cpp
+  connectionproxytest.cpp
+  eventlisttest.cpp
+  hostclassestest.cpp
+  miditovsttest.cpp
+  parameterchangestest.cpp
+  pluginterfacesupporttest.cpp
+  processdatatest.cpp
+  plugprovider.cpp
+  busactivation.cpp
+  busconsistency.cpp
+  businvalidindex.cpp
+  checkaudiobusarrangement.cpp
+  scanbusses.cpp
+  sidechainarrangement.cpp
+  editorclasses.cpp
+  midilearn.cpp
+  midimapping.cpp
+  plugcompat.cpp
+  scanparameters.cpp
+  suspendresume.cpp
+  terminit.cpp
+  keyswitch.cpp
+  noteexpression.cpp
+  automation.cpp
+  process.cpp
+  processcontextrequirements.cpp
+  processformat.cpp
+  processinputoverwriting.cpp
+  processtail.cpp
+  processthreaded.cpp
+  silenceflags.cpp
+  silenceprocessing.cpp
+  speakerarrangement.cpp
+  variableblocksize.cpp
+  bypasspersistence.cpp
+  invalidstatetransition.cpp
+  repeatidenticalstatetransition.cpp
+  validstatetransition.cpp
+  testbase.cpp
+  checkunitstructure.cpp
+  scanprograms.cpp
+  scanunits.cpp
+  vsttestsuite.cpp
+  testing.cpp
+  main.cpp
+  usediids.cpp
+  validator.cpp
+  module_win32.cpp
+  validator.vcxproj -> D:\a\_temp\rebirth-vst3-build\plugin-x64\bin\Release\validator.exe
+MSBuild version 17.14.60+43b635718 for .NET Framework
+
+  Building Custom Rule D:/a/Rebirth-338-VST-Windows/Rebirth-338-VST-Windows/vst3/plugin/CMakeLists.txt
+  adapter-test.cpp
+  bridge-adapter-test.vcxproj -> D:\a\_temp\rebirth-vst3-build\plugin-x64\Release\bridge-adapter-test.exe
