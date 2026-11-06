@@ -32,6 +32,8 @@ public:
         token_ = token;
         epoch_ = 1;
         cursor_ = playStart_ = engineFrame_ = 0;
+        lastTempo_ = RB_DEFAULT_TEMPO_MILLI / 1000.0;
+        lastFrames_ = 0;
         partial_ = 0;
         active_ = failedSeek_ = failedQueue_ = protocolError_ = haveLast_ = false;
         status_ = Ready;
@@ -100,8 +102,12 @@ public:
 
         if (!timing.playing) failedSeek_ = failedQueue_ = false;
         if (active_ && blockError == Ready && timing.playing && haveLast_) {
+            const double tempoDelta = std::abs(timing.tempo - lastTempo_);
+            const double tempoTransitionTolerance = tempoDelta * lastFrames_ /
+                (60.0 * RB_SAMPLE_RATE);
             if (timing.projectSamples != lastProjectEnd_ ||
-                std::abs(timing.quarterNotes - lastQuarterEnd_) > positionTolerance)
+                std::abs(timing.quarterNotes - lastQuarterEnd_) >
+                    positionTolerance + tempoTransitionTolerance)
                 failedSeek_ = true;
         }
         if (failedSeek_ && blockError == Ready && timing.playing)
@@ -183,6 +189,8 @@ public:
             lastProjectEnd_ = timing.projectSamples + frames;
         else haveLast_ = false;
         lastQuarterEnd_ = timing.quarterNotes + frames * quartersPerSample;
+        if (timing.valid && std::isfinite(timing.tempo)) lastTempo_ = timing.tempo;
+        lastFrames_ = frames;
     }
 private:
     struct Sample {
@@ -201,7 +209,8 @@ private:
     uint32_t token_ = 0, epoch_ = 1, partial_ = 0, underruns_ = 0;
     uint64_t cursor_ = 0, playStart_ = 0, engineFrame_ = 0;
     int64_t lastProjectEnd_ = 0;
-    double lastQuarterEnd_ = 0;
+    double lastQuarterEnd_ = 0, lastTempo_ = 140.0;
+    int32_t lastFrames_ = 0;
     bool active_ = false, failedSeek_ = false, failedQueue_ = false;
     bool protocolError_ = false, haveLast_ = false;
     Status status_ = Inactive;
