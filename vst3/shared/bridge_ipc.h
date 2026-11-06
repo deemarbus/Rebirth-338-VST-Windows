@@ -1,4 +1,4 @@
-/* ReBirth bridge v1: fixed-layout, local-session, one-client SPSC transport.
+/* ReBirth bridge v2: fixed-layout, local-session, one-client SPSC transport.
  * No pointers, HANDLEs, bools or native-size integers cross the ABI. */
 #ifndef RB_BRIDGE_IPC_H
 #define RB_BRIDGE_IPC_H
@@ -11,7 +11,7 @@ typedef LONG RBAtomic32;
 #else
 typedef int32_t RBAtomic32; /* Layout-only use in portable tests. */
 #endif
-#define RB_IPC_NAME L"Local\\ReBirth338Bridge.v1"
+#define RB_IPC_NAME L"Local\\ReBirth338Bridge.v2"
 #define RB_IPC_MAGIC UINT32_C(0x52423338)
 enum { RB_IPC_VERSION = 2, RB_RING_CAPACITY = 128, RB_BLOCK_FRAMES = 64,
        RB_SAMPLE_RATE = 44100, RB_PPQ = 192, RB_DEFAULT_TEMPO_MILLI = 140000,

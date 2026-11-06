@@ -1,7 +1,7 @@
 @echo off
 setlocal
 
-set "worker=%~dp0dist\windows\rebirth-bridge-worker.exe"
+set "worker=%~dp0dist\local-bpm-test\rebirth-bridge-worker.exe"
 set "dll=C:\ReBirth RB-338\Rebirth.dll"
 
 if not exist "%worker%" (
