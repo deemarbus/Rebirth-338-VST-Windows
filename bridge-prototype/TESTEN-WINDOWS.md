@@ -20,15 +20,20 @@ start de opnameproef automatisch.
 1. Laat het PowerShell-venster open en open de originele ReBirth-app.
 2. Laad hetzelfde demonummer dat eerder hoorbaar afspeelde.
 3. Zet **Loop uit**, stop en spoel terug naar het begin.
+   De testhost houdt ReBirth tijdens de voorbereiding gestopt. De **Play-knop
+   in ReBirth start deze proef niet**.
 4. Ga terug naar het PowerShell-venster en druk op **Enter**. De helper neemt
-   tien seconden op bij een vast tempo van 140 BPM.
+   de besturing van Play over en neemt tien seconden op bij een vast tempo
+   van 140 BPM.
 5. Als de opname klaar is, sluit ReBirth normaal af via **File > Quit**. Als de
    demo als gewijzigd wordt gemeld, kies ervoor de demo niet op te slaan.
 6. Na een geslaagde afsluiting staat een nieuw bestand `ReBirth-audiotest-....wav`
    op je bureaublad. Luister bijvoorbeeld via Ableton en zet bij import **Warp
    uit**, zodat je het oorspronkelijke testbestand hoort.
 
-Tijdens deze proef gaat de uitvoer naar het WAV-bestand. De proef bevestigt pas
+Tijdens deze proef hoor je **geen live geluid**: de uitvoer gaat alleen naar
+het WAV-bestand. Beluister dat bestand na de normale afsluiting van ReBirth.
+De proef bevestigt pas
 muziekweergave wanneer je het verwachte demonummer daarin hoort. Een numeriek
 geslaagde opname is nog geen voltooide VST3 of geteste Ableton-koppeling.
 

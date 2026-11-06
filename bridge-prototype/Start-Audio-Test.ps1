@@ -60,9 +60,11 @@ try {
     Write-Host 'De audioproef begint nu. Laat dit venster open.'
     Write-Host '1. Open de originele ReBirth-app en laad hetzelfde demonummer dat eerder geluid gaf.'
     Write-Host '2. Zet Loop uit, stop en spoel terug naar het begin.'
+    Write-Host '   De testhost houdt ReBirth gestopt. De Play-knop in ReBirth start deze proef niet.'
     Write-Host '3. Ga terug naar dit venster en druk op Enter om tien seconden op te nemen.'
     Write-Host '4. Sluit ReBirth daarna normaal af via File > Quit; sla wijzigingen in de demo niet op.'
-    Write-Host 'De host gebruikt 140 BPM. Tijdens deze proef gaat de uitvoer naar een WAV-bestand.'
+    Write-Host 'De host gebruikt 140 BPM en neemt de besturing van Play over na Enter.'
+    Write-Host 'Je hoort tijdens de proef geen live geluid; de uitvoer gaat alleen naar het WAV-bestand.'
     $rbCode = Invoke-ReBirthAudioProbe ('--capture "' + $rbEngine + '" "' + $rbWave + '"')
     if ($rbCode -ne 0) {
         throw ('De opname is nog niet geslaagd (code ' + $rbCode + '). Geef de getoonde melding door.')
