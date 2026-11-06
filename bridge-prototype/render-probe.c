@@ -20,7 +20,7 @@
 #include <math.h>
 #include <limits.h>
 
-#if !defined(_WIN32) || !defined(__i386__)
+#if !defined(_WIN32) || (!defined(__i386__) && !defined(_M_IX86))
 #error Build this experiment as a 32-bit x86 Windows executable.
 #endif
 _Static_assert(sizeof(void *) == 4, "The legacy ABI requires x86 pointers.");

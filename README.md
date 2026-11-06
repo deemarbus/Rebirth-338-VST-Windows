@@ -1,7 +1,7 @@
 # ReBirth RB-338 op Windows
 
 Doel: ReBirth gebruiken op modern Windows en uiteindelijk in Ableton Live 11/12.
-Er is nog geen werkende VST3 gebouwd. De aangeleverde macOS-plug-ins bevatten
+Er is nog geen in Ableton geteste VST3. De aangeleverde macOS-plug-ins bevatten
 gecompileerde Mach-O-programma's, geen broncode die rechtstreeks voor Windows
 kan worden gebouwd.
 
@@ -33,33 +33,40 @@ foutafhandeling en specifieke programma-invarianten. Ableton-integratie,
 transportkoppeling, VST3-projectstatus en meerdere plug-ininstanties zijn nog
 niet gevalideerd.
 
-## Volgende stap: de oude engine-interface controleren
+## Bevestigd: muziek uit de oude engine ophalen
 
 De oude engine is een 32-bits DLL met een ReWire 1-interface. Die kan niet
-rechtstreeks in het 64-bits proces van Ableton Live worden geladen. De te
-onderzoeken route is een afzonderlijke 32-bits helper, met later een 64-bits
+rechtstreeks in het 64-bits proces van Ableton Live worden geladen. De gekozen
+route is een afzonderlijke 32-bits helper, met later een 64-bits
 VST3 die audio en transport met die helper uitwisselt.
 
-Eerst moet een kleine testhost de precieze oude interface en echte
-audio-overdracht aantonen. De aangeleverde DLL gebruikt een andere
+De testhost heeft nu echte audio-overdracht aangetoond. De aangeleverde DLL gebruikt een andere
 audio-structuur dan latere ReWire-headers; die headers kunnen niet blind worden
-overgenomen. Een VST3-wrapper volgt pas na een geslaagde engineproef.
+overgenomen.
 
 De [eerste diagnostiek](bridge-prototype/README.md) en
 [analyse van de oude audiostructuur](bridge-prototype/legacy-drive-notes.md)
 staan bij de broncode. De metadata-aanroepen zijn onder Wine uitgevoerd en
 leveren versie 8 en de 18 verwachte kanalen op. Een afzonderlijke proef heeft
 daar ook Open, tien Idle-aanroepen, de sluitingscontrole, Close en het ontladen
-van de DLL succesvol doorlopen. Dat bewijst nog geen audio-overdracht naar een
-andere host; de renderproef en een Windows-test van de helper blijven nodig.
+van de DLL succesvol doorlopen. Deze cloudcontroles staan los van de
+hieronder beschreven luisterproef op Windows.
 
 De [renderhelper](bridge-prototype/render-README.md) heeft inmiddels ook negen
 echte renderaanroepen zonder song onder Wine doorlopen, met intacte buffers
-en normale afsluiting. De volgende proef is een opname van tien seconden met
-een echt geladen demonummer op Windows. De
+en normale afsluiting. Op 6 november 2026 heeft de gebruiker ook bevestigd dat
+de opnameproef op Windows werkt en dat het gemaakte WAV-bestand het verwachte
+demonummer bevat. Dit bevestigt hoorbare muziekoverdracht via de aparte host
+op die installatie. De
 [PowerShell-starter](bridge-prototype/Start-Audio-Test.ps1) en
-[Windows-uitleg](bridge-prototype/TESTEN-WINDOWS.md) staan klaar. Er is nog geen
-geladen-song-opname of VST3 in Ableton gevalideerd.
+[Windows-uitleg](bridge-prototype/TESTEN-WINDOWS.md) beschrijven deze proef.
+De volledige diagnostische JSON en een referentieopname zijn niet aangeleverd;
+dit resultaat berust op de terugmelding van de gebruiker.
+
+In [vst3](vst3/README.md) staat een experimentele 64-bits VST3 met een blijvende 32-bits
+helper. De eerste versie blijft bij 44,1 kHz, 140 BPM, stereo en één instantie,
+met Loop uit in ReBirth en starten vanaf het begin in Live. Een VST3 in
+Ableton is nog niet gevalideerd.
 
 ## Testen op Windows 10
 
@@ -122,5 +129,6 @@ en tijdelijke geheugenwijziging met ongewijzigd bestand. Bestandstoegang en de
 audiofunctie zelf worden daarbij niet op Windows uitgevoerd.
 
 De repository bevat geen originele ReBirth-binaries, ISO, engine, songs of
-macOS-programmabestanden. Voor een latere VST3-koppeling moeten eerst de
-zelfstandige werking, audio en de oude engine-/ReWire-koppeling worden gevalideerd.
+macOS-programmabestanden. Zelfstandige werking en muziekoverdracht via de
+testhost zijn door de gebruiker bevestigd. De realtime VST3-koppeling moet
+afzonderlijk op Windows en in Ableton worden gevalideerd.

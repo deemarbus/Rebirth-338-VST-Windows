@@ -7,3 +7,5 @@
 __pycache__/
 input-tests-*/
 verification/*-result.json
+/build-vst3/
+/dist/

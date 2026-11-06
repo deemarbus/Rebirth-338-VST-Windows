@@ -69,7 +69,50 @@ Guarded render-helper results, 2026-10-26:
   and unchanged complete output were recorded separately.
 
 The binary in `bridge-prototype/bin/windows-x86` is the project's own test
-helper, not the original engine or a VST3. A loaded-demo capture and listening
-comparison on native Windows remain necessary. `Start-Audio-Test.ps1` parses
-and uses PowerShell 5.1-compatible APIs; its interactive Windows path has not
+helper, not the original engine or a VST3. `Start-Audio-Test.ps1` parses and
+uses PowerShell 5.1-compatible APIs; its interactive Windows path has not
 been executed by the Linux checks.
+
+Subsequent user-reported Windows 10 validation, 2026-11-06:
+
+- The PowerShell audio test starts the original panel. During preparation,
+  panel Play requests are intentionally held stopped; Enter in the console
+  starts capture and there is no live monitoring.
+- The user confirmed capture works, then explicitly confirmed that the WAV
+  contains the expected demo song after the instruction to quit normally and
+  listen to the resulting file.
+- This establishes audible music capture through the separate x86 host on
+  that installation. The final JSON and a reference waveform were not supplied;
+  native guard counters and timing accuracy were not independently inspected.
+
+This is distinct from a VST3/Ableton integration test. Live transport, realtime
+IPC deadlines, latency compensation, project recall and multiple instances
+remain unverified.
+
+VST3 prototype development checks, 2026-11-06:
+
+- The real frontend cross-linked as an AMD64 PE DLL using the existing local
+  MinGW toolchain and the unchanged official SDK implementation units needed
+  by this component. The factory/module exports are `GetPluginFactory`,
+  `InitDll` and `ExitDll`. This selects dependencies in a separate build graph;
+  the earlier stock-SDK MinGW DataExchange allocator failure is not claimed fixed.
+- Portable tests exercise arbitrary host block sizes, the advertised 4,096-sample
+  delay, negative preroll, nonaligned stops/restarts, old-reply rejection,
+  missing replies, queue saturation and unsupported transport settings.
+- The worker's actual pure transport state machine passed 32 checks without
+  loading the engine, including not-ready starts, restart requirements,
+  discontinuities and client handoff. CMake/CTest ran the Linux IPC layout test.
+- A new persistent-worker no-panel smoke ran the real engine under Wine:
+  Open result 1, nine Drive/Idle calls, clean Close/FreeLibrary and unchanged
+  original EXE/DLL hashes, exit 0. Its stdout explicitly has audio_verified=false.
+  An additional unresolved QEMU signal-11 line appeared on stderr. This is
+  recorded separately, not described as a warning-free run or music playback.
+- The actual-header synthetic Windows x86 fixture passed FIFO, counter-wrap,
+  malformed-index and 16,384 concurrent request/reply checks under Wine. That
+  run also had an unresolved auxiliary QEMU signal-11 stderr line. It loads no
+  original engine and is not a native Windows test.
+
+The new Windows/MSVC script builds both architectures, exercises the IPC and
+transport fixtures, checks exports and runs the full official validator.
+The workflow publishes its own program files only after all those commands
+succeed. Writing the workflow alone does not establish it ran or passed.

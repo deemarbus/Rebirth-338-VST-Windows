@@ -1,0 +1,42 @@
+name: Windows VST3 prototype
+on:
+  push:
+    branches: [codex/windows-startup-compat]
+    paths: ['vst3/**', 'bridge-prototype/render-probe.c', '.github/workflows/windows-vst3.yml']
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: windows-vst3-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  build:
+    runs-on: windows-2022
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4, pinned
+      - name: Build and validate without original ReBirth assets
+        shell: pwsh
+        run: ./vst3/build-windows.ps1 -BuildRoot "$env:RUNNER_TEMP/rebirth-vst3-build" -Package
+      - name: Retain build evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4, pinned
+        with:
+          name: windows-build-evidence
+          path: ${{ runner.temp }}/rebirth-vst3-build/logs
+          if-no-files-found: warn
+      - name: Publish validated prototype files for direct downloads
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          git fetch origin $env:GITHUB_REF_NAME
+          if ($LASTEXITCODE -ne 0) { throw 'Fetch failed.' }
+          $remote = git rev-parse "origin/$env:GITHUB_REF_NAME"
+          if ($remote -ne $env:GITHUB_SHA) { throw 'Source branch changed during build; no files published.' }
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -f dist/windows
+          git commit -m "Publish validated Windows prototype from $env:GITHUB_SHA"
+          if ($LASTEXITCODE -ne 0) { throw 'Commit failed.' }
+          git push origin "HEAD:refs/heads/$env:GITHUB_REF_NAME"
+          if ($LASTEXITCODE -ne 0) { throw 'Push failed.' }
